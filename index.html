@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCGI ATTENDANCE SYSTEM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: #34495e;
+            color: white;
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar.open {
+            right: 0;
+        }
+        
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #4a6278;
+        }
+        
+        .close-sidebar {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 15px;
+        }
+        
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar-menu a:hover {
+            background-color: #4a6278;
+        }
+        
+        .main-content {
+            margin-top: 30px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .scanner-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        #scanner {
+            width: 100%;
+            height: 300px;
+            border: 2px dashed #ccc;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+        }
+        
+        #videoElement {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror effect for front camera */
+        }
+        
+        .manual-entry {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .switch-camera {
+            margin-top: 10px;
+            background-color: #3498db;
+        }
+        
+        .switch-camera:hover {
+            background-color: #2980b9;
+        }
+        
+        .manual-submit {
+            background-color: #27ae60;
+        }
+        
+        .manual-submit:hover {
+            background-color: #219653;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        
+        /* Profile Modal Styles */
+        .profile-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            display: none;
+        }
+        
+        .profile-content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .profile-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .profile-header h2 {
+            color: #2c3e50;
+        }
+        
+        .profile-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .profile-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 3px solid #2c3e50;
+        }
+        
+        .profile-details {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .profile-details p {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+        
+        .profile-details strong {
+            color: #2c3e50;
+        }
+        
+        .modal-ok {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .modal-ok:hover {
+            background-color: #1a252f;
+        }
+        
+        /* Attendance Table Styles */
+        .attendance-list {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .attendance-list th {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .attendance-list td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        
+        .attendance-list tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .attendance-list tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .user-cell {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid #2c3e50;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .time-cell {
+            font-family: monospace;
+        }
+        
+        .time-in {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        /* Admin Section Styles */
+        .admin-section {
+            display: none;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #1a252f;
+        }
+        
+        #qrcode {
+            margin: 20px auto;
+            display: none;
+            text-align: center;
+        }
+        
+        #qrcode canvas {
+            margin: 0 auto;
+        }
+        
+        .downloadQR {
+            background-color: #27ae60;
+        }
+        
+        .downloadQR:hover {
+            background-color: #219653;
+        }
+        
+        /* Permission Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .permission-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .permission-box h2 {
+            margin-bottom: 20px;
+        }
+        
+        .permission-box p {
+            margin-bottom: 30px;
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .btn-group button {
+            flex: 1;
+        }
+        
+        .btn-allow {
+            background-color: #27ae60;
+        }
+        
+        .btn-allow:hover {
+            background-color: #219653;
+        }
+        
+        .btn-deny {
+            background-color: #e74c3c;
+        }
+        
+        .btn-deny:hover {
+            background-color: #c0392b;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">MCGI ATTENDANCE SYSTEM</div>
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Admin Panel</h3>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" id="scanMenu">Scan QR Code</a></li>
+            <li><a href="#" id="adminMenu">Admin Tools</a></li>
+            <li><a href="#" id="attendanceMenu">View Attendance</a></li>
+        </ul>
+    </div>
+    
+    <!-- Camera Permission Overlay -->
+    <div class="overlay" id="permissionOverlay">
+        <div class="permission-box">
+            <h2>Camera Access Required</h2>
+            <p>This website needs access to your camera to scan QR codes. Please allow camera access to continue.</p>
+            <div class="btn-group">
+                <button class="btn-allow" id="allowCamera">Allow</button>
+                <button class="btn-deny" id="denyCamera">Deny</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Modal -->
+    <div class="profile-modal" id="profileModal">
+        <div class="profile-content">
+            <div class="profile-header">
+                <h2 id="modalUserName">User Profile</h2>
+            </div>
+            <div class="profile-body">
+                <img id="modalUserPhoto" class="profile-photo" src="" alt="User Photo">
+                <div class="profile-details">
+                    <p><strong>QR Code:</strong> <span id="modalQrNumber"></span></p>
+                    <p><strong>Age:</strong> <span id="modalUserAge"></span></p>
+                    <p><strong>Phone:</strong> <span id="modalUserPhone"></span></p>
+                    <p><strong>Address:</strong> <span id="modalUserAddress"></span></p>
+                    <p><strong>Time In:</strong> <span id="modalScanTime"></span></p>
+                </div>
+                <button class="modal-ok" id="modalOk">OK</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="main-content">
+            <div id="scanSection" class="section">
+                <h1>Scan QR Code</h1>
+                <div class="scanner-container">
+                    <div id="scanner">
+                        <video id="videoElement" playsinline style="display: none;"></video>
+                        <p>Camera access is required to scan QR codes</p>
+                    </div>
+                    <button id="startScanner">Start Scanner</button>
+                    <button id="switchCamera" class="switch-camera hidden">Switch Camera</button>
+                    
+                    <div class="manual-entry" id="manualEntry">
+                        <h3>Manual Entry</h3>
+                        <div class="form-group">
+                            <label for="manualQrNumber">QR Code Number</label>
+                            <input type="number" id="manualQrNumber" placeholder="Enter QR code number">
+                            <div id="qrNumberError" class="error-message"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="manualPassword">Password</label>
+                            <input type="password" id="manualPassword" placeholder="Enter password">
+                            <div id="passwordError" class="error-message"></div>
+                        </div>
+                        <button id="manualSubmit" class="manual-submit">Submit</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="adminSection" class="section admin-section">
+                <h1>Admin Tools</h1>
+                <div class="form-group">
+                    <label for="qrNumberInput">QR Code Number</label>
+                    <input type="number" id="qrNumberInput" placeholder="Enter unique QR code number">
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Password</label>
+                    <input type="password" id="userPassword" placeholder="Enter password for QR code">
+                </div>
+                <button id="generateQR">Generate QR Code</button>
+                <div id="qrcode"></div>
+                <button id="downloadQR" class="downloadQR hidden">Download QR Code</button>
+            </div>
+            
+            <div id="attendanceSection" class="section admin-section">
+                <h1>Attendance Records</h1>
+                <table class="attendance-list">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>QR #</th>
+                            <th>Time In</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                        <!-- Attendance records will be added here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const menuToggle = document.getElementById('menuToggle');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const sidebar = document.getElementById('sidebar');
+        const scanMenu = document.getElementById('scanMenu');
+        const adminMenu = document.getElementById('adminMenu');
+        const attendanceMenu = document.getElementById('attendanceMenu');
+        const scanSection = document.getElementById('scanSection');
+        const adminSection = document.getElementById('adminSection');
+        const attendanceSection = document.getElementById('attendanceSection');
+        const startScanner = document.getElementById('startScanner');
+        const switchCamera = document.getElementById('switchCamera');
+        const scanner = document.getElementById('scanner');
+        const videoElement = document.getElementById('videoElement');
+        const generateQR = document.getElementById('generateQR');
+        const qrcodeDiv = document.getElementById('qrcode');
+        const downloadQR = document.getElementById('downloadQR');
+        const permissionOverlay = document.getElementById('permissionOverlay');
+        const allowCamera = document.getElementById('allowCamera');
+        const denyCamera = document.getElementById('denyCamera');
+        const manualEntry = document.getElementById('manualEntry');
+        const manualQrNumber = document.getElementById('manualQrNumber');
+        const manualPassword = document.getElementById('manualPassword');
+        const manualSubmit = document.getElementById('manualSubmit');
+        const qrNumberError = document.getElementById('qrNumberError');
+        const passwordError = document.getElementById('passwordError');
+        
+        // Profile Modal Elements
+        const profileModal = document.getElementById('profileModal');
+        const modalUserName = document.getElementById('modalUserName');
+        const modalUserPhoto = document.getElementById('modalUserPhoto');
+        const modalQrNumber = document.getElementById('modalQrNumber');
+        const modalUserAge = document.getElementById('modalUserAge');
+        const modalUserPhone = document.getElementById('modalUserPhone');
+        const modalUserAddress = document.getElementById('modalUserAddress');
+        const modalScanTime = document.getElementById('modalScanTime');
+        const modalOk = document.getElementById('modalOk');
+        
+        // QR code data storage (hardcoded user database)
+        const userDatabase = {
+            "1": {
+                name: "Jurex Aso",
+                age: 18,
+                phone: "09357269270",
+                address: "Pob. B Midsalip ZDS",
+                photo: "https://i.imgur.com/JK19XQ0.jpg",
+                password: "Jurex143"
+            },
+            "2": {
+                name: "Jane Smith",
+                age: 28,
+                phone: "555-987-6543",
+                address: "456 Oak Ave, Somewhere",
+                photo: "https://i.imgur.com/7GZ1l5n.jpg",
+                password: "pass2"
+            },
+            "3": {
+                name: "Robert Johnson",
+                age: 35,
+                phone: "555-456-7890",
+                address: "789 Pine Rd, Nowhere",
+                photo: "https://i.imgur.com/3JQ2X9c.jpg",
+                password: "pass3"
+            },
+            "4": {
+                name: "Emily Davis",
+                age: 25,
+                phone: "555-321-6547",
+                address: "321 Elm Blvd, Anywhere",
+                photo: "https://i.imgur.com/5M9hK7T.jpg",
+                password: "pass4"
+            }
+        };
+        
+        let attendanceRecords = [];
+        let videoStream = null;
+        let scanning = false;
+        let animationFrameId = null;
+        let currentFacingMode = "user"; // Start with front camera
+        
+        // Sample admin password (in a real app, this would be securely stored)
+        const ADMIN_PASSWORD = "admin123";
+        
+        // Menu toggle
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.add('open');
+        });
+        
+        closeSidebar.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+        });
+        
+        // Navigation
+        scanMenu.addEventListener('click', (e) => {
+            e.preventDefault();
+            scanSection.style.display = 'block';
+            adminSection.style.display = 'none';
+            attendanceSection.style.display = 'none';
+            sidebar.classList.remove('open');
+        });
+        
+        adminMenu.addEventListener('click', (e) => {
+            e.preventDefault();
+            const password = prompt("Enter admin password:");
+            if (password === ADMIN_PASSWORD) {
+                scanSection.style.display = 'none';
+                adminSection.style.display = 'block';
+                attendanceSection.style.display = 'none';
+                sidebar.classList.remove('open');
+            } else {
+                alert("Incorrect password!");
+            }
+        });
+        
+        attendanceMenu.addEventListener('click', (e) => {
+            e.preventDefault();
+            const password = prompt("Enter admin password:");
+            if (password === ADMIN_PASSWORD) {
+                scanSection.style.display = 'none';
+                adminSection.style.display = 'none';
+                attendanceSection.style.display = 'block';
+                updateAttendanceTable();
+                sidebar.classList.remove('open');
+            } else {
+                alert("Incorrect password!");
+            }
+        });
+        
+        // Camera permission
+        startScanner.addEventListener('click', () => {
+            permissionOverlay.style.display = 'flex';
+        });
+        
+        allowCamera.addEventListener('click', () => {
+            permissionOverlay.style.display = 'none';
+            initScanner();
+        });
+        
+        denyCamera.addEventListener('click', () => {
+            permissionOverlay.style.display = 'none';
+            scanner.innerHTML = '<p>Camera access denied. You can manually enter QR details below.</p>';
+            manualEntry.style.display = 'block';
+        });
+        
+        // Switch camera button
+        switchCamera.addEventListener('click', () => {
+            currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+            stopScanner();
+            initScanner();
+        });
+        
+        // QR Code Scanner
+        function initScanner() {
+            const constraints = {
+                video: { 
+                    facingMode: currentFacingMode,
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            };
+            
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(function(stream) {
+                    videoStream = stream;
+                    videoElement.srcObject = stream;
+                    videoElement.style.display = 'block';
+                    scanner.querySelector('p').style.display = 'none';
+                    switchCamera.classList.remove('hidden');
+                    
+                    videoElement.play();
+                    
+                    scanning = true;
+                    scanFrame();
+                })
+                .catch(function(err) {
+                    console.error("Error accessing camera: ", err);
+                    scanner.innerHTML = '<p>Could not access camera. You can manually enter QR details below.</p>';
+                    manualEntry.style.display = 'block';
+                });
+        }
+        
+        function scanFrame() {
+            if (!scanning) return;
+            
+            if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
+                const canvas = document.createElement('canvas');
+                canvas.width = videoElement.videoWidth;
+                canvas.height = videoElement.videoHeight;
+                const ctx = canvas.getContext('2d');
+                
+                // Draw the video frame to the canvas
+                ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                
+                if (code) {
+                    handleScannedQR(code.data);
+                }
+            }
+            
+            animationFrameId = requestAnimationFrame(scanFrame);
+        }
+        
+        function stopScanner() {
+            scanning = false;
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoElement.srcObject = null;
+                videoElement.style.display = 'none';
+                scanner.querySelector('p').style.display = 'block';
+                switchCamera.classList.add('hidden');
+            }
+        }
+        
+        function handleScannedQR(data) {
+            try {
+                const parsedData = JSON.parse(data);
+                processQRData(parsedData);
+            } catch (e) {
+                console.error("Error parsing QR code: ", e);
+                alert("Invalid QR Code format.");
+            }
+        }
+        
+        function processQRData(parsedData) {
+            // Check if this is a valid QR code from our system
+            if (parsedData.qrNumber && userDatabase[parsedData.qrNumber]) {
+                const user = userDatabase[parsedData.qrNumber];
+                
+                // Verify password if provided in QR code
+                if (parsedData.password && parsedData.password !== user.password) {
+                    alert("Invalid password in QR code!");
+                    return;
+                }
+                
+                const now = new Date();
+                
+                // Show profile in modal
+                showProfileModal({
+                    name: user.name,
+                    photo: user.photo,
+                    qrNumber: parsedData.qrNumber,
+                    age: user.age,
+                    phone: user.phone,
+                    address: user.address,
+                    time: now
+                });
+                
+                // Add to attendance records if not already present for today
+                const today = new Date().toDateString();
+                const alreadyRecorded = attendanceRecords.some(record => 
+                    record.qrNumber === parsedData.qrNumber && 
+                    record.time.toDateString() === today
+                );
+                
+                if (!alreadyRecorded) {
+                    attendanceRecords.push({
+                        qrNumber: parsedData.qrNumber,
+                        name: user.name,
+                        time: now,
+                        age: user.age,
+                        phone: user.phone,
+                        address: user.address,
+                        photo: user.photo
+                    });
+                }
+                
+                // Stop scanning temporarily
+                stopScanner();
+            } else {
+                alert("Invalid QR Code. Please scan a valid attendance QR code.");
+            }
+        }
+        
+        function showProfileModal(userData) {
+            modalUserName.textContent = userData.name;
+            modalUserPhoto.src = userData.photo;
+            modalQrNumber.textContent = userData.qrNumber;
+            modalUserAge.textContent = userData.age;
+            modalUserPhone.textContent = userData.phone;
+            modalUserAddress.textContent = userData.address;
+            modalScanTime.textContent = userData.time.toLocaleString();
+            
+            profileModal.style.display = 'flex';
+        }
+        
+        // Close modal when OK button is clicked
+        modalOk.addEventListener('click', () => {
+            profileModal.style.display = 'none';
+            initScanner(); // Restart the scanner
+        });
+        
+        // Manual entry submission
+        manualSubmit.addEventListener('click', () => {
+            qrNumberError.textContent = '';
+            passwordError.textContent = '';
+            
+            const qrNum = manualQrNumber.value;
+            const password = manualPassword.value;
+            
+            if (!qrNum) {
+                qrNumberError.textContent = 'QR Code number is required';
+                return;
+            }
+            
+            if (!password) {
+                passwordError.textContent = 'Password is required';
+                return;
+            }
+            
+            if (!userDatabase[qrNum]) {
+                qrNumberError.textContent = 'Invalid QR Code number';
+                return;
+            }
+            
+            if (userDatabase[qrNum].password !== password) {
+                passwordError.textContent = 'Incorrect password';
+                return;
+            }
+            
+            // Process the manual entry
+            const now = new Date();
+            const user = userDatabase[qrNum];
+            
+            showProfileModal({
+                name: user.name,
+                photo: user.photo,
+                qrNumber: qrNum,
+                age: user.age,
+                phone: user.phone,
+                address: user.address,
+                time: now
+            });
+            
+            // Add to attendance records if not already present for today
+            const today = new Date().toDateString();
+            const alreadyRecorded = attendanceRecords.some(record => 
+                record.qrNumber === qrNum && 
+                record.time.toDateString() === today
+            );
+            
+            if (!alreadyRecorded) {
+                attendanceRecords.push({
+                    qrNumber: qrNum,
+                    name: user.name,
+                    time: now,
+                    age: user.age,
+                    phone: user.phone,
+                    address: user.address,
+                    photo: user.photo
+                });
+            }
+            
+            // Clear the form
+            manualQrNumber.value = '';
+            manualPassword.value = '';
+        });
+        
+        // QR Code Generator
+        generateQR.addEventListener('click', () => {
+            const qrNum = document.getElementById('qrNumberInput').value;
+            const password = document.getElementById('userPassword').value;
+            
+            if (!qrNum || !password) {
+                alert("Please fill in all fields!");
+                return;
+            }
+            
+            // Check if this QR number exists in our database
+            if (!userDatabase[qrNum]) {
+                alert(`Error: No user data found for QR code #${qrNum}. Please add user data to the JavaScript code first.`);
+                return;
+            }
+            
+            // Generate QR code with encrypted data
+            const qrContent = JSON.stringify({
+                qrNumber: qrNum,
+                password: password
+            });
+            
+            qrcodeDiv.innerHTML = '';
+            QRCode.toCanvas(qrcodeDiv, qrContent, { width: 200 }, (error) => {
+                if (error) {
+                    console.error(error);
+                    alert("Error generating QR code!");
+                } else {
+                    qrcodeDiv.style.display = 'block';
+                    downloadQR.classList.remove('hidden');
+                    
+                    // Set up download button
+                    downloadQR.onclick = () => {
+                        const canvas = qrcodeDiv.querySelector('canvas');
+                        const link = document.createElement('a');
+                        link.download = `qr-attendance-${qrNum}.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                    };
+                }
+            });
+        });
+        
+        // Update attendance table
+        function updateAttendanceTable() {
+            const tableBody = document.getElementById('attendanceTableBody');
+            tableBody.innerHTML = '';
+            
+            // Sort by most recent first
+            const sortedRecords = [...attendanceRecords].sort((a, b) => b.time - a.time);
+            
+            sortedRecords.forEach(record => {
+                const row = document.createElement('tr');
+                
+                // User cell with avatar and name
+                const userCell = document.createElement('td');
+                userCell.className = 'user-cell';
+                userCell.innerHTML = `
+                    <img src="${record.photo}" class="user-avatar" alt="${record.name}">
+                    <span class="user-name">${record.name}</span>
+                `;
+                row.appendChild(userCell);
+                
+                // QR Number cell
+                const qrCell = document.createElement('td');
+                qrCell.textContent = record.qrNumber;
+                row.appendChild(qrCell);
+                
+                // Time cell with formatted time
+                const timeCell = document.createElement('td');
+                timeCell.className = 'time-cell';
+                timeCell.innerHTML = `
+                    <div>${record.time.toLocaleDateString()}</div>
+                    <div class="time-in">${record.time.toLocaleTimeString()}</div>
+                `;
+                row.appendChild(timeCell);
+                
+                // Details cell
+                const detailsCell = document.createElement('td');
+                detailsCell.innerHTML = `
+                    <div><strong>Age:</strong> ${record.age}</div>
+                    <div><strong>Phone:</strong> ${record.phone}</div>
+                    <div><strong>Address:</strong> ${record.address}</div>
+                `;
+                row.appendChild(detailsCell);
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Initialize with scan section visible
+        scanSection.style.display = 'block';
+        adminSection.style.display = 'none';
+        attendanceSection.style.display = 'none';
+        
+        // Clean up when page is closed
+        window.addEventListener('beforeunload', () => {
+            stopScanner();
+        });
+    </script>
+</body>
+</html>
