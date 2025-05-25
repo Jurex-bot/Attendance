@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCGI Attendance System</title>
+    <title>MCGI ATTENDANCE SYSTEM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
@@ -38,6 +38,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
         }
         
         .logo {
@@ -481,7 +495,10 @@
 <body>
     <header>
         <div class="container header-content">
-            <div class="logo">MCGI Attendance System</div>
+            <div class="logo-container">
+                <img src="https://i.imgur.com/JK19XQ0.jpg" class="logo-img" alt="Logo">
+                <div class="logo">MCGI ATTENDANCE SYSTEM</div>
+            </div>
             <button class="menu-toggle" id="menuToggle">
                 <i class="fas fa-bars"></i>
             </button>
@@ -496,9 +513,9 @@
             </button>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="#" id="scanMenu"HOME</a></li>
-            <li><a href="#" id="adminMenu">QR CODE GENERATOR</a></li>
-            <li><a href="#" id="attendanceMenu">MCGI RECORDS</a></li>
+            <li><a href="#" id="scanMenu">🏠|HOME</a></li>
+            <li><a href="#" id="adminMenu">📜|QR CODEGEN</a></li>
+            <li><a href="#" id="attendanceMenu">📑|ATTENDANCE LIST</a></li>
         </ul>
     </div>
     
@@ -506,7 +523,7 @@
     <div class="overlay" id="permissionOverlay">
         <div class="permission-box">
             <h2>Camera Access Required</h2>
-            <p>Welcome brother and sister This website needs access to your camera to scan QR codes. Please allow camera access to continue.</p>
+            <p>This website needs access to your camera to scan QR codes. Please allow camera access to continue.</p>
             <div class="btn-group">
                 <button class="btn-allow" id="allowCamera">Allow</button>
                 <button class="btn-deny" id="denyCamera">Deny</button>
@@ -625,7 +642,8 @@
                             <tr>
                                 <th>User</th>
                                 <th>QR #</th>
-                                <th>Time In</th>
+                                <th>Status</th>
+                                <th>Time</th>
                                 <th>Details</th>
                             </tr>
                         </thead>
@@ -1417,46 +1435,82 @@
             });
         }
         
-        // Update all records table
+        // Update all records table (shows both present and absent users)
         function updateAllTable() {
             const tableBody = document.getElementById('allTableBody');
             tableBody.innerHTML = '';
             
-            // Sort by most recent first
-            const sortedRecords = [...attendanceRecords].sort((a, b) => b.time - a.time);
+            const today = new Date().toDateString();
+            const presentQrNumbers = attendanceRecords
+                .filter(record => record.time.toDateString() === today)
+                .map(record => record.qrNumber);
             
-            sortedRecords.forEach(record => {
+            // Combine all users with their status
+            const allUsers = Object.keys(userDatabase).map(qrNum => {
+                const user = userDatabase[qrNum];
+                const isPresent = presentQrNumbers.includes(qrNum);
+                const record = attendanceRecords.find(r => 
+                    r.qrNumber === qrNum && r.time.toDateString() === today
+                );
+                
+                return {
+                    qrNumber: qrNum,
+                    name: user.name,
+                    photo: user.photo,
+                    age: user.age,
+                    phone: user.phone,
+                    address: user.address,
+                    isPresent: isPresent,
+                    time: isPresent ? record.time : null
+                };
+            });
+            
+            // Sort by name
+            const sortedUsers = [...allUsers].sort((a, b) => a.name.localeCompare(b.name));
+            
+            sortedUsers.forEach(user => {
                 const row = document.createElement('tr');
                 
                 // User cell with avatar and name
                 const userCell = document.createElement('td');
                 userCell.className = 'user-cell';
                 userCell.innerHTML = `
-                    <img src="${record.photo}" class="user-avatar" alt="${record.name}">
-                    <span class="user-name">${record.name}</span>
+                    <img src="${user.photo}" class="user-avatar" alt="${user.name}">
+                    <span class="user-name">${user.name}</span>
                 `;
                 row.appendChild(userCell);
                 
                 // QR Number cell
                 const qrCell = document.createElement('td');
-                qrCell.textContent = record.qrNumber;
+                qrCell.textContent = user.qrNumber;
                 row.appendChild(qrCell);
                 
-                // Time cell with formatted time
+                // Status cell
+                const statusCell = document.createElement('td');
+                statusCell.innerHTML = user.isPresent 
+                    ? `<span class="time-in">Present</span>` 
+                    : `<span class="absent">Absent</span>`;
+                row.appendChild(statusCell);
+                
+                // Time cell with formatted time if present
                 const timeCell = document.createElement('td');
                 timeCell.className = 'time-cell';
-                timeCell.innerHTML = `
-                    <div>${record.time.toLocaleDateString()}</div>
-                    <div class="time-in">${record.time.toLocaleTimeString()}</div>
-                `;
+                if (user.isPresent && user.time) {
+                    timeCell.innerHTML = `
+                        <div>${user.time.toLocaleDateString()}</div>
+                        <div>${user.time.toLocaleTimeString()}</div>
+                    `;
+                } else {
+                    timeCell.textContent = '-';
+                }
                 row.appendChild(timeCell);
                 
                 // Details cell
                 const detailsCell = document.createElement('td');
                 detailsCell.innerHTML = `
-                    <div><strong>Age:</strong> ${record.age}</div>
-                    <div><strong>Phone:</strong> ${record.phone}</div>
-                    <div><strong>Address:</strong> ${record.address}</div>
+                    <div><strong>Age:</strong> ${user.age}</div>
+                    <div><strong>Phone:</strong> ${user.phone}</div>
+                    <div><strong>Address:</strong> ${user.address}</div>
                 `;
                 row.appendChild(detailsCell);
                 
