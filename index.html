@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCGI ATTENDANCE SYSTEM</title>
+    <title>MCGI Attendance System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
@@ -324,6 +324,11 @@
             font-weight: bold;
         }
         
+        .absent {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
         /* Admin Section Styles */
         .admin-section {
             display: none;
@@ -440,12 +445,43 @@
         .hidden {
             display: none;
         }
+        
+        /* Tabs for attendance view */
+        .attendance-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .attendance-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .attendance-tab.active {
+            background-color: #2c3e50;
+            color: white;
+            border-color: #2c3e50;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="container header-content">
-            <div class="logo">MCGI ATTENDANCE SYSTEM</div>
+            <div class="logo">MCGI Attendance System</div>
             <button class="menu-toggle" id="menuToggle">
                 <i class="fas fa-bars"></i>
             </button>
@@ -460,9 +496,9 @@
             </button>
         </div>
         <ul class="sidebar-menu">
-            <li><a href="#" id="scanMenu">Scan QR Code</a></li>
-            <li><a href="#" id="adminMenu">Admin Tools</a></li>
-            <li><a href="#" id="attendanceMenu">View Attendance</a></li>
+            <li><a href="#" id="scanMenu"HOME</a></li>
+            <li><a href="#" id="adminMenu">QR CODE GENERATOR</a></li>
+            <li><a href="#" id="attendanceMenu">MCGI RECORDS</a></li>
         </ul>
     </div>
     
@@ -470,7 +506,7 @@
     <div class="overlay" id="permissionOverlay">
         <div class="permission-box">
             <h2>Camera Access Required</h2>
-            <p>This website needs access to your camera to scan QR codes. Please allow camera access to continue.</p>
+            <p>Welcome brother and sister This website needs access to your camera to scan QR codes. Please allow camera access to continue.</p>
             <div class="btn-group">
                 <button class="btn-allow" id="allowCamera">Allow</button>
                 <button class="btn-deny" id="denyCamera">Deny</button>
@@ -544,19 +580,60 @@
             
             <div id="attendanceSection" class="section admin-section">
                 <h1>Attendance Records</h1>
-                <table class="attendance-list">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>QR #</th>
-                            <th>Time In</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
-                    <tbody id="attendanceTableBody">
-                        <!-- Attendance records will be added here dynamically -->
-                    </tbody>
-                </table>
+                
+                <div class="attendance-tabs">
+                    <div class="attendance-tab active" data-tab="present">Present Today</div>
+                    <div class="attendance-tab" data-tab="absent">Absent Today</div>
+                    <div class="attendance-tab" data-tab="all">All Records</div>
+                </div>
+                
+                <div id="presentTab" class="tab-content active">
+                    <table class="attendance-list">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>QR #</th>
+                                <th>Time In</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="presentTableBody">
+                            <!-- Present records will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="absentTab" class="tab-content">
+                    <table class="attendance-list">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>QR #</th>
+                                <th>Status</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="absentTableBody">
+                            <!-- Absent records will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="allTab" class="tab-content">
+                    <table class="attendance-list">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>QR #</th>
+                                <th>Time In</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allTableBody">
+                            <!-- All records will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -600,8 +677,19 @@
         const modalScanTime = document.getElementById('modalScanTime');
         const modalOk = document.getElementById('modalOk');
         
+        // Attendance tabs
+        const attendanceTabs = document.querySelectorAll('.attendance-tab');
+        
         // QR code data storage (hardcoded user database)
         const userDatabase = {
+            "1": {
+                name: "John Doe",
+                age: 30,
+                phone: "555-123-4567",
+                address: "123 Main St, Anytown",
+                photo: "https://i.imgur.com/JK19XQ0.jpg",
+                password: "pass1"
+            },
             "1": {
                 name: "Jurex Aso",
                 age: 18,
@@ -842,6 +930,30 @@
                 photo: "https://i.imgur.com/5M9hK7T.jpg",
                 password: "pass4"
             }
+            "2": {
+                name: "Jane Smith",
+                age: 28,
+                phone: "555-987-6543",
+                address: "456 Oak Ave, Somewhere",
+                photo: "https://i.imgur.com/7GZ1l5n.jpg",
+                password: "pass2"
+            },
+            "3": {
+                name: "Robert Johnson",
+                age: 35,
+                phone: "555-456-7890",
+                address: "789 Pine Rd, Nowhere",
+                photo: "https://i.imgur.com/3JQ2X9c.jpg",
+                password: "pass3"
+            },
+            "4": {
+                name: "Emily Davis",
+                age: 25,
+                phone: "555-321-6547",
+                address: "321 Elm Blvd, Anywhere",
+                photo: "https://i.imgur.com/5M9hK7T.jpg",
+                password: "pass4"
+            }
         };
         
         let attendanceRecords = [];
@@ -891,11 +1003,30 @@
                 scanSection.style.display = 'none';
                 adminSection.style.display = 'none';
                 attendanceSection.style.display = 'block';
-                updateAttendanceTable();
+                updateAttendanceTables();
                 sidebar.classList.remove('open');
             } else {
                 alert("Incorrect password!");
             }
+        });
+        
+        // Attendance tabs functionality
+        attendanceTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                attendanceTabs.forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show the selected tab content
+                const tabId = tab.getAttribute('data-tab') + 'Tab';
+                document.getElementById(tabId).classList.add('active');
+            });
         });
         
         // Camera permission
@@ -1176,9 +1307,119 @@
             });
         });
         
-        // Update attendance table
-        function updateAttendanceTable() {
-            const tableBody = document.getElementById('attendanceTableBody');
+        // Update all attendance tables
+        function updateAttendanceTables() {
+            updatePresentTable();
+            updateAbsentTable();
+            updateAllTable();
+        }
+        
+        // Update present table
+        function updatePresentTable() {
+            const tableBody = document.getElementById('presentTableBody');
+            tableBody.innerHTML = '';
+            
+            const today = new Date().toDateString();
+            const todayRecords = attendanceRecords.filter(record => 
+                record.time.toDateString() === today
+            );
+            
+            // Sort by most recent first
+            const sortedRecords = [...todayRecords].sort((a, b) => b.time - a.time);
+            
+            sortedRecords.forEach(record => {
+                const row = document.createElement('tr');
+                
+                // User cell with avatar and name
+                const userCell = document.createElement('td');
+                userCell.className = 'user-cell';
+                userCell.innerHTML = `
+                    <img src="${record.photo}" class="user-avatar" alt="${record.name}">
+                    <span class="user-name">${record.name}</span>
+                `;
+                row.appendChild(userCell);
+                
+                // QR Number cell
+                const qrCell = document.createElement('td');
+                qrCell.textContent = record.qrNumber;
+                row.appendChild(qrCell);
+                
+                // Time cell with formatted time
+                const timeCell = document.createElement('td');
+                timeCell.className = 'time-cell';
+                timeCell.innerHTML = `
+                    <div>${record.time.toLocaleDateString()}</div>
+                    <div class="time-in">${record.time.toLocaleTimeString()}</div>
+                `;
+                row.appendChild(timeCell);
+                
+                // Details cell
+                const detailsCell = document.createElement('td');
+                detailsCell.innerHTML = `
+                    <div><strong>Age:</strong> ${record.age}</div>
+                    <div><strong>Phone:</strong> ${record.phone}</div>
+                    <div><strong>Address:</strong> ${record.address}</div>
+                `;
+                row.appendChild(detailsCell);
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Update absent table
+        function updateAbsentTable() {
+            const tableBody = document.getElementById('absentTableBody');
+            tableBody.innerHTML = '';
+            
+            const today = new Date().toDateString();
+            const presentQrNumbers = attendanceRecords
+                .filter(record => record.time.toDateString() === today)
+                .map(record => record.qrNumber);
+            
+            // Find all registered users who are not present today
+            const absentUsers = Object.keys(userDatabase).filter(qrNum => 
+                !presentQrNumbers.includes(qrNum)
+            );
+            
+            absentUsers.forEach(qrNum => {
+                const user = userDatabase[qrNum];
+                const row = document.createElement('tr');
+                
+                // User cell with avatar and name
+                const userCell = document.createElement('td');
+                userCell.className = 'user-cell';
+                userCell.innerHTML = `
+                    <img src="${user.photo}" class="user-avatar" alt="${user.name}">
+                    <span class="user-name">${user.name}</span>
+                `;
+                row.appendChild(userCell);
+                
+                // QR Number cell
+                const qrCell = document.createElement('td');
+                qrCell.textContent = qrNum;
+                row.appendChild(qrCell);
+                
+                // Status cell
+                const statusCell = document.createElement('td');
+                statusCell.innerHTML = `<span class="absent">Absent</span>`;
+                row.appendChild(statusCell);
+                
+                // Details cell
+                const detailsCell = document.createElement('td');
+                detailsCell.innerHTML = `
+                    <div><strong>Age:</strong> ${user.age}</div>
+                    <div><strong>Phone:</strong> ${user.phone}</div>
+                    <div><strong>Address:</strong> ${user.address}</div>
+                `;
+                row.appendChild(detailsCell);
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Update all records table
+        function updateAllTable() {
+            const tableBody = document.getElementById('allTableBody');
             tableBody.innerHTML = '';
             
             // Sort by most recent first
