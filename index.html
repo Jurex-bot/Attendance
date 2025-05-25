@@ -514,7 +514,7 @@
         </div>
         <ul class="sidebar-menu">
             <li><a href="#" id="scanMenu">🏠|HOME</a></li>
-            <li><a href="#" id="adminMenu">📜|QR CODEGEN</a></li>
+            <li><a href="#" id="adminMenu">📜|QR GEN</a></li>
             <li><a href="#" id="attendanceMenu">📑|ATTENDANCE LIST</a></li>
         </ul>
     </div>
@@ -701,14 +701,6 @@
         // QR code data storage (hardcoded user database)
         const userDatabase = {
             "1": {
-                name: "John Doe",
-                age: 30,
-                phone: "555-123-4567",
-                address: "123 Main St, Anytown",
-                photo: "https://i.imgur.com/JK19XQ0.jpg",
-                password: "pass1"
-            },
-            "1": {
                 name: "Jurex Aso",
                 age: 18,
                 phone: "09357269270",
@@ -716,238 +708,6 @@
                 photo: "https://i.imgur.com/MDbk7n8.png",
                 password: "Jurex143"
             },
-            "2": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "3": {
-                name: "Robert Johnson",
-                age: 35,
-                phone: "555-456-7890",
-                address: "789 Pine Rd, Nowhere",
-                photo: "https://i.imgur.com/3JQ2X9c.jpg",
-                password: "pass3"
-            },
-            "4": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "5": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "6": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "7": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "8": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "9": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "10": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "11": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "12": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "13": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "14": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "15": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "16": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "17": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "18": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "19": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "20": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "21": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "22": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "23": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "24": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "25": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "26": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "27": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "28": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "29": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "30": {
-                name: "Emily Davis",
-                age: 25,
-                phone: "555-321-6547",
-                address: "321 Elm Blvd, Anywhere",
-                photo: "https://i.imgur.com/5M9hK7T.jpg",
-                password: "pass4"
-            }
             "2": {
                 name: "Jane Smith",
                 age: 28,
@@ -1529,4 +1289,4 @@
         });
     </script>
 </body>
-</html>
+    </html>
