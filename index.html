@@ -490,6 +490,37 @@
         .tab-content.active {
             display: block;
         }
+        
+        /* Storage permission styles */
+        .storage-permission {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .storage-permission p {
+            margin-bottom: 10px;
+        }
+        
+        .btn-request-storage {
+            background-color: #17a2b8;
+        }
+        
+        .btn-request-storage:hover {
+            background-color: #138496;
+        }
+        
+        /* APK download button */
+        .apk-download {
+            background-color: #6f42c1;
+            margin-top: 10px;
+        }
+        
+        .apk-download:hover {
+            background-color: #5a32a3;
+        }
     </style>
 </head>
 <body>
@@ -516,6 +547,7 @@
             <li><a href="#" id="scanMenu">🏠|HOME</a></li>
             <li><a href="#" id="adminMenu">📜|QR GEN</a></li>
             <li><a href="#" id="attendanceMenu">📑|ATTENDANCE LIST</a></li>
+            <li><a href="#" id="downloadApp">📱|DOWNLOAD APP</a></li>
         </ul>
     </div>
     
@@ -527,6 +559,18 @@
             <div class="btn-group">
                 <button class="btn-allow" id="allowCamera">Allow</button>
                 <button class="btn-deny" id="denyCamera">Deny</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Storage Permission Overlay -->
+    <div class="overlay" id="storagePermissionOverlay">
+        <div class="permission-box">
+            <h2>Storage Access Required</h2>
+            <p>This app needs access to your device storage to save attendance records and database. Please allow storage access to continue.</p>
+            <div class="btn-group">
+                <button class="btn-allow" id="allowStorage">Allow</button>
+                <button class="btn-deny" id="denyStorage">Deny</button>
             </div>
         </div>
     </div>
@@ -551,6 +595,26 @@
         </div>
     </div>
     
+    <!-- App Download Modal -->
+    <div class="profile-modal" id="appDownloadModal">
+        <div class="profile-content">
+            <div class="profile-header">
+                <h2>Download Mobile App</h2>
+            </div>
+            <div class="profile-body">
+                <img class="profile-photo" src="https://i.imgur.com/JK19XQ0.jpg" alt="App Icon">
+                <div class="profile-details">
+                    <p><strong>MCGI Attendance System</strong></p>
+                    <p>Version: 1.0.0</p>
+                    <p>Size: 15 MB</p>
+                    <p>Requires Android 8.0 or higher</p>
+                </div>
+                <button class="apk-download" id="downloadApk">Download APK</button>
+                <button class="modal-ok" id="closeAppModal" style="margin-top: 10px;">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
         <div class="main-content">
             <div id="scanSection" class="section">
@@ -562,6 +626,13 @@
                     </div>
                     <button id="startScanner">Start Scanner</button>
                     <button id="switchCamera" class="switch-camera hidden">Switch Camera</button>
+                    
+                    <!-- Storage permission request -->
+                    <div class="storage-permission" id="storagePermissionSection">
+                        <p><strong>Storage Permission Required</strong></p>
+                        <p>To save attendance records locally on your device, please grant storage access permission.</p>
+                        <button id="requestStorage" class="btn-request-storage">Grant Storage Access</button>
+                    </div>
                     
                     <div class="manual-entry" id="manualEntry">
                         <h3>Manual Entry</h3>
@@ -593,6 +664,18 @@
                 <button id="generateQR">Generate QR Code</button>
                 <div id="qrcode"></div>
                 <button id="downloadQR" class="downloadQR hidden">Download QR Code</button>
+                
+                <!-- Database management section -->
+                <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+                    <h2>Database Management</h2>
+                    <div class="form-group">
+                        <label for="backupName">Backup Name</label>
+                        <input type="text" id="backupName" placeholder="Enter backup name">
+                    </div>
+                    <button id="backupDatabase">Backup Database</button>
+                    <button id="restoreDatabase">Restore Database</button>
+                    <div id="databaseStatus" style="margin-top: 10px; color: #27ae60;"></div>
+                </div>
             </div>
             
             <div id="attendanceSection" class="section admin-section">
@@ -664,6 +747,7 @@
         const scanMenu = document.getElementById('scanMenu');
         const adminMenu = document.getElementById('adminMenu');
         const attendanceMenu = document.getElementById('attendanceMenu');
+        const downloadApp = document.getElementById('downloadApp');
         const scanSection = document.getElementById('scanSection');
         const adminSection = document.getElementById('adminSection');
         const attendanceSection = document.getElementById('attendanceSection');
@@ -677,12 +761,24 @@
         const permissionOverlay = document.getElementById('permissionOverlay');
         const allowCamera = document.getElementById('allowCamera');
         const denyCamera = document.getElementById('denyCamera');
+        const storagePermissionOverlay = document.getElementById('storagePermissionOverlay');
+        const allowStorage = document.getElementById('allowStorage');
+        const denyStorage = document.getElementById('denyStorage');
+        const requestStorage = document.getElementById('requestStorage');
+        const storagePermissionSection = document.getElementById('storagePermissionSection');
         const manualEntry = document.getElementById('manualEntry');
         const manualQrNumber = document.getElementById('manualQrNumber');
         const manualPassword = document.getElementById('manualPassword');
         const manualSubmit = document.getElementById('manualSubmit');
         const qrNumberError = document.getElementById('qrNumberError');
         const passwordError = document.getElementById('passwordError');
+        const backupDatabase = document.getElementById('backupDatabase');
+        const restoreDatabase = document.getElementById('restoreDatabase');
+        const backupName = document.getElementById('backupName');
+        const databaseStatus = document.getElementById('databaseStatus');
+        const appDownloadModal = document.getElementById('appDownloadModal');
+        const downloadApk = document.getElementById('downloadApk');
+        const closeAppModal = document.getElementById('closeAppModal');
         
         // Profile Modal Elements
         const profileModal = document.getElementById('profileModal');
@@ -698,8 +794,12 @@
         // Attendance tabs
         const attendanceTabs = document.querySelectorAll('.attendance-tab');
         
-        // QR code data storage (hardcoded user database)
-        const userDatabase = {
+        // Check if running in Android WebView
+        const isAndroidApp = navigator.userAgent.toLowerCase().includes('android') && 
+                            navigator.userAgent.toLowerCase().includes('wv');
+        
+        // QR code data storage (will be loaded from device storage)
+        let userDatabase = {
             "1": {
                 name: "Jurex Aso",
                 age: 18,
@@ -739,9 +839,225 @@
         let scanning = false;
         let animationFrameId = null;
         let currentFacingMode = "user"; // Start with front camera
+        let hasStorageAccess = false;
         
         // Sample admin password (in a real app, this would be securely stored)
         const ADMIN_PASSWORD = "admin123";
+        
+        // Initialize the app
+        function initApp() {
+            // Check if we're in an Android app
+            if (isAndroidApp) {
+                console.log("Running in Android WebView");
+                // Hide the download app button since we're already in the app
+                downloadApp.style.display = 'none';
+                
+                // Request storage permissions immediately in app
+                requestStorageAccess();
+            } else {
+                console.log("Running in browser");
+                // Show storage permission section for browser
+                storagePermissionSection.style.display = 'block';
+            }
+            
+            // Try to load database from storage
+            loadDatabase();
+        }
+        
+        // Request storage access
+        function requestStorageAccess() {
+            if (isAndroidApp) {
+                // In Android app, use the Android interface
+                try {
+                    Android.requestStoragePermission();
+                } catch (e) {
+                    console.error("Android interface not available:", e);
+                    alert("Storage access not available in this environment");
+                }
+            } else {
+                // In browser, show the permission overlay
+                storagePermissionOverlay.style.display = 'flex';
+            }
+        }
+        
+        // Handle storage permission granted
+        function onStoragePermissionGranted() {
+            console.log("Storage permission granted");
+            hasStorageAccess = true;
+            storagePermissionSection.style.display = 'none';
+            storagePermissionOverlay.style.display = 'none';
+            
+            // Load database from storage
+            loadDatabase();
+        }
+        
+        // Load database from device storage
+        function loadDatabase() {
+            if (!hasStorageAccess) return;
+            
+            if (isAndroidApp) {
+                // In Android app, get data from Android storage
+                try {
+                    const dbJson = Android.loadDatabase();
+                    if (dbJson) {
+                        const data = JSON.parse(dbJson);
+                        userDatabase = data.userDatabase || userDatabase;
+                        attendanceRecords = data.attendanceRecords || attendanceRecords;
+                        console.log("Database loaded from Android storage");
+                    }
+                } catch (e) {
+                    console.error("Error loading from Android storage:", e);
+                }
+            } else {
+                // In browser, use localStorage
+                const dbJson = localStorage.getItem('attendanceDatabase');
+                if (dbJson) {
+                    const data = JSON.parse(dbJson);
+                    userDatabase = data.userDatabase || userDatabase;
+                    attendanceRecords = data.attendanceRecords || attendanceRecords;
+                    console.log("Database loaded from localStorage");
+                }
+            }
+        }
+        
+        // Save database to device storage
+        function saveDatabase() {
+            if (!hasStorageAccess) return;
+            
+            const data = {
+                userDatabase,
+                attendanceRecords,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            if (isAndroidApp) {
+                // In Android app, save to Android storage
+                try {
+                    Android.saveDatabase(JSON.stringify(data));
+                    console.log("Database saved to Android storage");
+                } catch (e) {
+                    console.error("Error saving to Android storage:", e);
+                }
+            } else {
+                // In browser, use localStorage
+                localStorage.setItem('attendanceDatabase', JSON.stringify(data));
+                console.log("Database saved to localStorage");
+            }
+        }
+        
+        // Backup database to file
+        function backupDatabaseToFile() {
+            if (!hasStorageAccess) {
+                alert("Storage access not granted. Please grant storage access first.");
+                return;
+            }
+            
+            const backupFileName = backupName.value || `attendance_backup_${new Date().toISOString().slice(0,10)}.json`;
+            const data = {
+                userDatabase,
+                attendanceRecords,
+                backupDate: new Date().toISOString()
+            };
+            
+            if (isAndroidApp) {
+                // In Android app, use the Android interface
+                try {
+                    Android.backupDatabase(backupFileName, JSON.stringify(data));
+                    databaseStatus.textContent = `Backup saved as ${backupFileName}`;
+                    setTimeout(() => databaseStatus.textContent = '', 3000);
+                } catch (e) {
+                    console.error("Error backing up in Android:", e);
+                    databaseStatus.textContent = "Backup failed";
+                    setTimeout(() => databaseStatus.textContent = '', 3000);
+                }
+            } else {
+                // In browser, create download link
+                const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = backupFileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                databaseStatus.textContent = `Backup saved as ${backupFileName}`;
+                setTimeout(() => databaseStatus.textContent = '', 3000);
+            }
+        }
+        
+        // Restore database from file
+        function restoreDatabaseFromFile() {
+            if (!hasStorageAccess) {
+                alert("Storage access not granted. Please grant storage access first.");
+                return;
+            }
+            
+            if (isAndroidApp) {
+                // In Android app, trigger file picker
+                try {
+                    Android.restoreDatabase();
+                } catch (e) {
+                    console.error("Error restoring in Android:", e);
+                    databaseStatus.textContent = "Restore failed";
+                    setTimeout(() => databaseStatus.textContent = '', 3000);
+                }
+            } else {
+                // In browser, use file input
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = event => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (data.userDatabase && data.attendanceRecords) {
+                                userDatabase = data.userDatabase;
+                                attendanceRecords = data.attendanceRecords;
+                                saveDatabase();
+                                updateAttendanceTables();
+                                databaseStatus.textContent = "Database restored successfully";
+                                setTimeout(() => databaseStatus.textContent = '', 3000);
+                            } else {
+                                throw new Error("Invalid backup file format");
+                            }
+                        } catch (err) {
+                            console.error("Error parsing backup file:", err);
+                            databaseStatus.textContent = "Invalid backup file";
+                            setTimeout(() => databaseStatus.textContent = '', 3000);
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
+        }
+        
+        // Handle database restored from Android
+        function onDatabaseRestored(dbJson) {
+            try {
+                const data = JSON.parse(dbJson);
+                if (data.userDatabase && data.attendanceRecords) {
+                    userDatabase = data.userDatabase;
+                    attendanceRecords = data.attendanceRecords;
+                    saveDatabase();
+                    updateAttendanceTables();
+                    databaseStatus.textContent = "Database restored successfully";
+                    setTimeout(() => databaseStatus.textContent = '', 3000);
+                } else {
+                    throw new Error("Invalid backup file format");
+                }
+            } catch (err) {
+                console.error("Error parsing restored database:", err);
+                databaseStatus.textContent = "Invalid backup file";
+                setTimeout(() => databaseStatus.textContent = '', 3000);
+            }
+        }
         
         // Menu toggle
         menuToggle.addEventListener('click', () => {
@@ -788,6 +1104,39 @@
             }
         });
         
+        downloadApp.addEventListener('click', (e) => {
+            e.preventDefault();
+            appDownloadModal.style.display = 'flex';
+            sidebar.classList.remove('open');
+        });
+        
+        // Close app download modal
+        closeAppModal.addEventListener('click', () => {
+            appDownloadModal.style.display = 'none';
+        });
+        
+        // Download APK
+        downloadApk.addEventListener('click', () => {
+            // Replace with your actual APK download URL
+            const apkUrl = 'https://example.com/path/to/your/app.apk';
+            
+            if (isAndroidApp) {
+                // In Android app, use the Android interface
+                try {
+                    Android.downloadFile(apkUrl, 'MCGIAttendance.apk');
+                } catch (e) {
+                    console.error("Android interface not available:", e);
+                    // Fallback to browser download
+                    window.open(apkUrl, '_blank');
+                }
+            } else {
+                // In browser, open download link
+                window.open(apkUrl, '_blank');
+            }
+            
+            appDownloadModal.style.display = 'none';
+        });
+        
         // Attendance tabs functionality
         attendanceTabs.forEach(tab => {
             tab.addEventListener('click', () => {
@@ -822,6 +1171,24 @@
             scanner.innerHTML = '<p>Camera access denied. You can manually enter QR details below.</p>';
             manualEntry.style.display = 'block';
         });
+        
+        // Storage permission
+        requestStorage.addEventListener('click', () => {
+            requestStorageAccess();
+        });
+        
+        allowStorage.addEventListener('click', () => {
+            onStoragePermissionGranted();
+        });
+        
+        denyStorage.addEventListener('click', () => {
+            storagePermissionOverlay.style.display = 'none';
+            alert("Storage access is required for full functionality. You can grant access later.");
+        });
+        
+        // Database backup/restore
+        backupDatabase.addEventListener('click', backupDatabaseToFile);
+        restoreDatabase.addEventListener('click', restoreDatabaseFromFile);
         
         // Switch camera button
         switchCamera.addEventListener('click', () => {
@@ -949,6 +1316,9 @@
                         address: user.address,
                         photo: user.photo
                     });
+                    
+                    // Save to database
+                    saveDatabase();
                 }
                 
                 // Stop scanning temporarily
@@ -1035,6 +1405,9 @@
                     address: user.address,
                     photo: user.photo
                 });
+                
+                // Save to database
+                saveDatabase();
             }
             
             // Clear the form
@@ -1054,7 +1427,7 @@
             
             // Check if this QR number exists in our database
             if (!userDatabase[qrNum]) {
-                alert(`Error: No user data found for QR code #${qrNum}. Please add user data to the JavaScript code first.`);
+                alert(`Error: No user data found for QR code #${qrNum}. Please add user data first.`);
                 return;
             }
             
@@ -1283,10 +1656,17 @@
         adminSection.style.display = 'none';
         attendanceSection.style.display = 'none';
         
+        // Initialize the app
+        initApp();
+        
         // Clean up when page is closed
         window.addEventListener('beforeunload', () => {
             stopScanner();
         });
+        
+        // Expose functions for Android interface
+        window.onStoragePermissionGranted = onStoragePermissionGranted;
+        window.onDatabaseRestored = onDatabaseRestored;
     </script>
 </body>
-    </html>
+</html>
