@@ -8,16 +8,31 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --text-color: #333;
+            --text-light: #7f8c8d;
+            --white: #fff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
             background-color: #f5f5f5;
-            color: #333;
+            color: var(--text-color);
             line-height: 1.6;
         }
         
@@ -28,10 +43,13 @@
         }
         
         header {
-            background-color: #2c3e50;
-            color: white;
+            background-color: var(--primary-color);
+            color: var(--white);
             padding: 15px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
         .header-content {
@@ -51,7 +69,7 @@
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid white;
+            border: 2px solid var(--white);
         }
         
         .logo {
@@ -62,9 +80,14 @@
         .menu-toggle {
             background: none;
             border: none;
-            color: white;
+            color: var(--white);
             font-size: 24px;
             cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .menu-toggle:hover {
+            transform: scale(1.1);
         }
         
         .sidebar {
@@ -73,8 +96,8 @@
             right: -300px;
             width: 300px;
             height: 100%;
-            background-color: #34495e;
-            color: white;
+            background-color: var(--dark-color);
+            color: var(--white);
             transition: right 0.3s ease;
             z-index: 1000;
             padding: 20px;
@@ -97,9 +120,14 @@
         .close-sidebar {
             background: none;
             border: none;
-            color: white;
+            color: var(--white);
             font-size: 24px;
             cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .close-sidebar:hover {
+            transform: rotate(90deg);
         }
         
         .sidebar-menu {
@@ -111,30 +139,55 @@
         }
         
         .sidebar-menu a {
-            color: white;
+            color: var(--white);
             text-decoration: none;
             font-size: 18px;
             display: block;
             padding: 10px;
             border-radius: 5px;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
         }
         
         .sidebar-menu a:hover {
             background-color: #4a6278;
+            transform: translateX(-5px);
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
         }
         
         .main-content {
             margin-top: 30px;
-            background-color: white;
-            border-radius: 8px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
             padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         h1 {
             margin-bottom: 20px;
-            color: #2c3e50;
+            color: var(--primary-color);
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--secondary-color);
         }
         
         .section {
@@ -157,6 +210,9 @@
             align-items: center;
             justify-content: center;
             background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            position: relative;
         }
         
         #videoElement {
@@ -166,17 +222,60 @@
             transform: scaleX(-1); /* Mirror effect for front camera */
         }
         
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            flex-direction: column;
+            z-index: 10;
+        }
+        
+        .scanner-overlay i {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        
         .manual-entry {
             margin-top: 20px;
             padding: 20px;
             background-color: #f9f9f9;
-            border-radius: 5px;
+            border-radius: var(--border-radius);
             display: none;
         }
         
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn i {
+            font-size: 14px;
+        }
+        
         .switch-camera {
-            margin-top: 10px;
-            background-color: #3498db;
+            background-color: var(--secondary-color);
         }
         
         .switch-camera:hover {
@@ -184,7 +283,7 @@
         }
         
         .manual-submit {
-            background-color: #27ae60;
+            background-color: var(--success-color);
         }
         
         .manual-submit:hover {
@@ -192,13 +291,13 @@
         }
         
         .error-message {
-            color: #e74c3c;
+            color: var(--danger-color);
             margin-top: 5px;
             font-size: 14px;
         }
         
         /* Profile Modal Styles */
-        .profile-modal {
+        .modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -212,14 +311,15 @@
             display: none;
         }
         
-        .profile-content {
-            background-color: white;
-            border-radius: 10px;
+        .modal-content {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
             padding: 30px;
             width: 90%;
             max-width: 500px;
             text-align: center;
             animation: modalFadeIn 0.3s;
+            position: relative;
         }
         
         @keyframes modalFadeIn {
@@ -227,17 +327,17 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .profile-header {
+        .modal-header {
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 1px solid #eee;
         }
         
-        .profile-header h2 {
-            color: #2c3e50;
+        .modal-header h2 {
+            color: var(--primary-color);
         }
         
-        .profile-body {
+        .modal-body {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -249,36 +349,37 @@
             border-radius: 50%;
             object-fit: cover;
             margin-bottom: 20px;
-            border: 3px solid #2c3e50;
+            border: 3px solid var(--primary-color);
+            box-shadow: var(--shadow);
         }
         
         .profile-details {
             text-align: center;
             margin-bottom: 25px;
+            width: 100%;
         }
         
         .profile-details p {
             margin: 8px 0;
             font-size: 16px;
+            padding: 8px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
         }
         
         .profile-details strong {
-            color: #2c3e50;
+            color: var(--primary-color);
         }
         
-        .modal-ok {
-            background-color: #2c3e50;
-            color: white;
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
             border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
+            font-size: 24px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        .modal-ok:hover {
-            background-color: #1a252f;
+            color: var(--text-light);
         }
         
         /* Attendance Table Styles */
@@ -286,12 +387,14 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            border-radius: var(--border-radius);
+            overflow: hidden;
         }
         
         .attendance-list th {
-            background-color: #2c3e50;
-            color: white;
+            background-color: var(--primary-color);
+            color: var(--white);
             padding: 15px;
             text-align: left;
         }
@@ -321,12 +424,12 @@
             border-radius: 50%;
             object-fit: cover;
             margin-right: 15px;
-            border: 2px solid #2c3e50;
+            border: 2px solid var(--primary-color);
         }
         
         .user-name {
             font-weight: 600;
-            color: #2c3e50;
+            color: var(--primary-color);
         }
         
         .time-cell {
@@ -334,12 +437,12 @@
         }
         
         .time-in {
-            color: #27ae60;
+            color: var(--success-color);
             font-weight: bold;
         }
         
         .absent {
-            color: #e74c3c;
+            color: var(--danger-color);
             font-weight: bold;
         }
         
@@ -356,47 +459,51 @@
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
+            color: var(--primary-color);
         }
         
-        .form-group input, .form-group select {
+        .form-control {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: var(--border-radius);
             font-size: 16px;
+            transition: border 0.3s;
         }
         
-        button {
-            background-color: #2c3e50;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
         }
         
-        button:hover {
-            background-color: #1a252f;
+        .btn-primary {
+            background-color: var(--primary-color);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
         }
         
         #qrcode {
             margin: 20px auto;
             display: none;
             text-align: center;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
         }
         
         #qrcode canvas {
             margin: 0 auto;
-        }
-        
-        .downloadQR {
-            background-color: #27ae60;
-        }
-        
-        .downloadQR:hover {
-            background-color: #219653;
         }
         
         /* Permission Overlay */
@@ -415,19 +522,22 @@
         }
         
         .permission-box {
-            background-color: white;
+            background-color: var(--white);
             padding: 30px;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             max-width: 500px;
             text-align: center;
+            animation: modalFadeIn 0.3s;
         }
         
         .permission-box h2 {
             margin-bottom: 20px;
+            color: var(--primary-color);
         }
         
         .permission-box p {
             margin-bottom: 30px;
+            color: var(--text-color);
         }
         
         .btn-group {
@@ -441,19 +551,11 @@
         }
         
         .btn-allow {
-            background-color: #27ae60;
-        }
-        
-        .btn-allow:hover {
-            background-color: #219653;
+            background-color: var(--success-color);
         }
         
         .btn-deny {
-            background-color: #e74c3c;
-        }
-        
-        .btn-deny:hover {
-            background-color: #c0392b;
+            background-color: var(--danger-color);
         }
         
         .hidden {
@@ -475,12 +577,17 @@
             border-bottom: none;
             margin-right: 5px;
             border-radius: 5px 5px 0 0;
+            transition: all 0.3s;
+        }
+        
+        .attendance-tab:hover {
+            background-color: #e1e1e1;
         }
         
         .attendance-tab.active {
-            background-color: #2c3e50;
-            color: white;
-            border-color: #2c3e50;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
         }
         
         .tab-content {
@@ -491,249 +598,438 @@
             display: block;
         }
         
-        /* Storage permission styles */
-        .storage-permission {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            border-left: 4px solid #ffc107;
+        /* Login Modal */
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
         }
         
-        .storage-permission p {
-            margin-bottom: 10px;
+        .login-content {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            animation: modalFadeIn 0.3s;
         }
         
-        .btn-request-storage {
-            background-color: #17a2b8;
+        .login-content h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
         }
         
-        .btn-request-storage:hover {
-            background-color: #138496;
+        .login-content input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
         }
         
-        /* APK download button */
-        .apk-download {
-            background-color: #6f42c1;
+        .login-content button {
+            width: 100%;
             margin-top: 10px;
         }
         
-        .apk-download:hover {
-            background-color: #5a32a3;
+        /* File upload */
+        .file-upload {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .file-upload input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .file-upload-label {
+            display: block;
+            padding: 15px;
+            border: 2px dashed #ccc;
+            border-radius: var(--border-radius);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload-label:hover {
+            border-color: var(--secondary-color);
+            background-color: #f9f9f9;
+        }
+        
+        .file-upload-label i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+        
+        .file-name {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        /* Admin user management */
+        .user-management {
+            margin-top: 30px;
+        }
+        
+        .user-card {
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+        
+        .user-card-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid var(--primary-color);
+        }
+        
+        .user-card-info {
+            flex: 1;
+        }
+        
+        .user-card-name {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .user-card-qr {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .user-card-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .sidebar {
+                width: 250px;
+            }
+            
+            .attendance-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .attendance-tab {
+                margin-bottom: 5px;
+                flex: 1;
+                text-align: center;
+            }
+            
+            .attendance-list {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container header-content">
-            <div class="logo-container">
-                <img src="https://i.imgur.com/JK19XQ0.jpg" class="logo-img" alt="Logo">
-                <div class="logo">MCGI ATTENDANCE SYSTEM</div>
+    <!-- Login Modal (shown first) -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-content">
+            <h2>Admin Login</h2>
+            <div class="form-group">
+                <input type="text" id="loginUsername" placeholder="Username" class="form-control">
             </div>
-            <button class="menu-toggle" id="menuToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </header>
-    
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3>Admin Panel</h3>
-            <button class="close-sidebar" id="closeSidebar">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="#" id="scanMenu">🏠|HOME</a></li>
-            <li><a href="#" id="adminMenu">📜|QR GEN</a></li>
-            <li><a href="#" id="attendanceMenu">📑|ATTENDANCE LIST</a></li>
-            <li><a href="#" id="downloadApp">📱|DOWNLOAD APP</a></li>
-        </ul>
-    </div>
-    
-    <!-- Camera Permission Overlay -->
-    <div class="overlay" id="permissionOverlay">
-        <div class="permission-box">
-            <h2>Camera Access Required</h2>
-            <p>This website needs access to your camera to scan QR codes. Please allow camera access to continue.</p>
-            <div class="btn-group">
-                <button class="btn-allow" id="allowCamera">Allow</button>
-                <button class="btn-deny" id="denyCamera">Deny</button>
+            <div class="form-group">
+                <input type="password" id="loginPassword" placeholder="Password" class="form-control">
             </div>
+            <button id="loginButton" class="btn btn-primary">Login</button>
+            <div id="loginError" style="color: var(--danger-color); margin-top: 15px;"></div>
         </div>
     </div>
     
-    <!-- Storage Permission Overlay -->
-    <div class="overlay" id="storagePermissionOverlay">
-        <div class="permission-box">
-            <h2>Storage Access Required</h2>
-            <p>This app needs access to your device storage to save attendance records and database. Please allow storage access to continue.</p>
-            <div class="btn-group">
-                <button class="btn-allow" id="allowStorage">Allow</button>
-                <button class="btn-deny" id="denyStorage">Deny</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Profile Modal -->
-    <div class="profile-modal" id="profileModal">
-        <div class="profile-content">
-            <div class="profile-header">
-                <h2 id="modalUserName">User Profile</h2>
-            </div>
-            <div class="profile-body">
-                <img id="modalUserPhoto" class="profile-photo" src="" alt="User Photo">
-                <div class="profile-details">
-                    <p><strong>QR Code:</strong> <span id="modalQrNumber"></span></p>
-                    <p><strong>Age:</strong> <span id="modalUserAge"></span></p>
-                    <p><strong>Phone:</strong> <span id="modalUserPhone"></span></p>
-                    <p><strong>Address:</strong> <span id="modalUserAddress"></span></p>
-                    <p><strong>Time In:</strong> <span id="modalScanTime"></span></p>
+    <!-- Main App (hidden until login) -->
+    <div id="appContent" style="display: none;">
+        <header>
+            <div class="container header-content">
+                <div class="logo-container">
+                    <img src="https://i.imgur.com/JK19XQ0.jpg" class="logo-img" alt="Logo">
+                    <div class="logo">MCGI ATTENDANCE SYSTEM</div>
                 </div>
-                <button class="modal-ok" id="modalOk">OK</button>
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
+        </header>
+        
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Admin Panel</h3>
+                <button class="close-sidebar" id="closeSidebar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" id="scanMenu"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#" id="adminMenu"><i class="fas fa-qrcode"></i> QR Generator</a></li>
+                <li><a href="#" id="userManagementMenu"><i class="fas fa-users-cog"></i> User Management</a></li>
+                <li><a href="#" id="attendanceMenu"><i class="fas fa-clipboard-list"></i> Attendance List</a></li>
+                <li><a href="#" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
         </div>
-    </div>
-    
-    <!-- App Download Modal -->
-    <div class="profile-modal" id="appDownloadModal">
-        <div class="profile-content">
-            <div class="profile-header">
-                <h2>Download Mobile App</h2>
-            </div>
-            <div class="profile-body">
-                <img class="profile-photo" src="https://i.imgur.com/JK19XQ0.jpg" alt="App Icon">
-                <div class="profile-details">
-                    <p><strong>MCGI Attendance System</strong></p>
-                    <p>Version: 1.0.0</p>
-                    <p>Size: 15 MB</p>
-                    <p>Requires Android 8.0 or higher</p>
+        
+        <!-- Camera Permission Overlay -->
+        <div class="overlay" id="permissionOverlay">
+            <div class="permission-box">
+                <h2>Permissions Required</h2>
+                <p>This app needs access to your camera and storage to function properly. Please allow the requested permissions.</p>
+                <div class="btn-group">
+                    <button class="btn btn-allow" id="allowPermissions">Allow</button>
+                    <button class="btn btn-deny" id="denyPermissions">Deny</button>
                 </div>
-                <button class="apk-download" id="downloadApk">Download APK</button>
-                <button class="modal-ok" id="closeAppModal" style="margin-top: 10px;">Cancel</button>
             </div>
         </div>
-    </div>
-    
-    <div class="container">
-        <div class="main-content">
-            <div id="scanSection" class="section">
-                <h1>Scan QR Code</h1>
-                <div class="scanner-container">
-                    <div id="scanner">
-                        <video id="videoElement" playsinline style="display: none;"></video>
-                        <p>Camera access is required to scan QR codes</p>
+        
+        <!-- Profile Modal -->
+        <div class="modal" id="profileModal">
+            <div class="modal-content">
+                <button class="modal-close" id="modalClose">&times;</button>
+                <div class="modal-header">
+                    <h2 id="modalUserName">User Profile</h2>
+                </div>
+                <div class="modal-body">
+                    <img id="modalUserPhoto" class="profile-photo" src="" alt="User Photo">
+                    <div class="profile-details">
+                        <p><strong>QR Code:</strong> <span id="modalQrNumber"></span></p>
+                        <p><strong>Age:</strong> <span id="modalUserAge"></span></p>
+                        <p><strong>Phone:</strong> <span id="modalUserPhone"></span></p>
+                        <p><strong>Address:</strong> <span id="modalUserAddress"></span></p>
+                        <p><strong>Time In:</strong> <span id="modalScanTime"></span></p>
                     </div>
-                    <button id="startScanner">Start Scanner</button>
-                    <button id="switchCamera" class="switch-camera hidden">Switch Camera</button>
-                    
-                    <!-- Storage permission request -->
-                    <div class="storage-permission" id="storagePermissionSection">
-                        <p><strong>Storage Permission Required</strong></p>
-                        <p>To save attendance records locally on your device, please grant storage access permission.</p>
-                        <button id="requestStorage" class="btn-request-storage">Grant Storage Access</button>
-                    </div>
-                    
-                    <div class="manual-entry" id="manualEntry">
-                        <h3>Manual Entry</h3>
-                        <div class="form-group">
-                            <label for="manualQrNumber">QR Code Number</label>
-                            <input type="number" id="manualQrNumber" placeholder="Enter QR code number">
-                            <div id="qrNumberError" class="error-message"></div>
-                        </div>
-                        <div class="form-group">
-                            <label for="manualPassword">Password</label>
-                            <input type="password" id="manualPassword" placeholder="Enter password">
-                            <div id="passwordError" class="error-message"></div>
-                        </div>
-                        <button id="manualSubmit" class="manual-submit">Submit</button>
-                    </div>
+                    <button class="btn btn-primary" id="modalOk">OK</button>
                 </div>
             </div>
-            
-            <div id="adminSection" class="section admin-section">
-                <h1>Admin Tools</h1>
-                <div class="form-group">
-                    <label for="qrNumberInput">QR Code Number</label>
-                    <input type="number" id="qrNumberInput" placeholder="Enter unique QR code number">
+        </div>
+        
+        <!-- Add User Modal -->
+        <div class="modal" id="addUserModal">
+            <div class="modal-content">
+                <button class="modal-close" id="addUserModalClose">&times;</button>
+                <div class="modal-header">
+                    <h2>Add New User</h2>
                 </div>
-                <div class="form-group">
-                    <label for="userPassword">Password</label>
-                    <input type="password" id="userPassword" placeholder="Enter password for QR code">
-                </div>
-                <button id="generateQR">Generate QR Code</button>
-                <div id="qrcode"></div>
-                <button id="downloadQR" class="downloadQR hidden">Download QR Code</button>
-                
-                <!-- Database management section -->
-                <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
-                    <h2>Database Management</h2>
+                <div class="modal-body">
                     <div class="form-group">
-                        <label for="backupName">Backup Name</label>
-                        <input type="text" id="backupName" placeholder="Enter backup name">
+                        <label for="newUserName">Full Name</label>
+                        <input type="text" id="newUserName" class="form-control" placeholder="Enter full name">
                     </div>
-                    <button id="backupDatabase">Backup Database</button>
-                    <button id="restoreDatabase">Restore Database</button>
-                    <div id="databaseStatus" style="margin-top: 10px; color: #27ae60;"></div>
+                    <div class="form-group">
+                        <label for="newUserAge">Age</label>
+                        <input type="number" id="newUserAge" class="form-control" placeholder="Enter age">
+                    </div>
+                    <div class="form-group">
+                        <label for="newUserPhone">Phone Number</label>
+                        <input type="tel" id="newUserPhone" class="form-control" placeholder="Enter phone number">
+                    </div>
+                    <div class="form-group">
+                        <label for="newUserAddress">Address</label>
+                        <input type="text" id="newUserAddress" class="form-control" placeholder="Enter address">
+                    </div>
+                    <div class="form-group">
+                        <label for="newUserQrNumber">QR Code Number</label>
+                        <input type="number" id="newUserQrNumber" class="form-control" placeholder="Enter unique QR code number">
+                    </div>
+                    <div class="form-group">
+                        <label for="newUserPassword">Password</label>
+                        <input type="password" id="newUserPassword" class="form-control" placeholder="Enter password">
+                    </div>
+                    <div class="form-group">
+                        <label>Profile Photo</label>
+                        <div class="file-upload">
+                            <input type="file" id="newUserPhoto" accept="image/*">
+                            <label for="newUserPhoto" class="file-upload-label">
+                                <i class="fas fa-camera"></i>
+                                <div>Click to upload photo</div>
+                                <div id="newUserPhotoName" class="file-name">No file selected</div>
+                            </label>
+                        </div>
+                    </div>
+                    <button id="saveUserButton" class="btn btn-success">Save User</button>
+                    <div id="addUserError" style="color: var(--danger-color); margin-top: 15px;"></div>
                 </div>
             </div>
-            
-            <div id="attendanceSection" class="section admin-section">
-                <h1>Attendance Records</h1>
-                
-                <div class="attendance-tabs">
-                    <div class="attendance-tab active" data-tab="present">Present Today</div>
-                    <div class="attendance-tab" data-tab="absent">Absent Today</div>
-                    <div class="attendance-tab" data-tab="all">All Records</div>
+        </div>
+        
+        <div class="container">
+            <div class="main-content">
+                <div id="scanSection" class="section">
+                    <h1>Scan QR Code</h1>
+                    <div class="scanner-container">
+                        <div id="scanner">
+                            <video id="videoElement" playsinline style="display: none;"></video>
+                            <div class="scanner-overlay" id="scannerOverlay">
+                                <i class="fas fa-camera"></i>
+                                <p>Camera access is required to scan QR codes</p>
+                            </div>
+                        </div>
+                        <button id="startScanner" class="btn btn-primary">
+                            <i class="fas fa-camera"></i> Start Scanner
+                        </button>
+                        <button id="switchCamera" class="btn switch-camera hidden">
+                            <i class="fas fa-sync-alt"></i> Switch Camera
+                        </button>
+                        
+                        <div class="manual-entry" id="manualEntry">
+                            <h3>Manual Entry</h3>
+                            <div class="form-group">
+                                <label for="manualQrNumber">QR Code Number</label>
+                                <input type="number" id="manualQrNumber" class="form-control" placeholder="Enter QR code number">
+                                <div id="qrNumberError" class="error-message"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="manualPassword">Password</label>
+                                <input type="password" id="manualPassword" class="form-control" placeholder="Enter password">
+                                <div id="passwordError" class="error-message"></div>
+                            </div>
+                            <button id="manualSubmit" class="btn manual-submit">
+                                <i class="fas fa-check"></i> Submit
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 
-                <div id="presentTab" class="tab-content active">
-                    <table class="attendance-list">
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>QR #</th>
-                                <th>Time In</th>
-                                <th>Details</th>
-                            </tr>
-                        </thead>
-                        <tbody id="presentTableBody">
-                            <!-- Present records will be added here dynamically -->
-                        </tbody>
-                    </table>
+                <div id="adminSection" class="section admin-section">
+                    <h1>QR Code Generator</h1>
+                    <div class="form-group">
+                        <label for="qrNumberInput">QR Code Number</label>
+                        <input type="number" id="qrNumberInput" class="form-control" placeholder="Enter unique QR code number">
+                    </div>
+                    <div class="form-group">
+                        <label for="userPassword">Password</label>
+                        <input type="password" id="userPassword" class="form-control" placeholder="Enter password for QR code">
+                    </div>
+                    <button id="generateQR" class="btn btn-primary">
+                        <i class="fas fa-qrcode"></i> Generate QR Code
+                    </button>
+                    <div id="qrcode"></div>
+                    <button id="downloadQR" class="btn btn-success hidden">
+                        <i class="fas fa-download"></i> Download QR Code
+                    </button>
                 </div>
                 
-                <div id="absentTab" class="tab-content">
-                    <table class="attendance-list">
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>QR #</th>
-                                <th>Status</th>
-                                <th>Details</th>
-                            </tr>
-                        </thead>
-                        <tbody id="absentTableBody">
-                            <!-- Absent records will be added here dynamically -->
-                        </tbody>
-                    </table>
+                <div id="userManagementSection" class="section admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h1>User Management</h1>
+                        <button id="addUserButton" class="btn btn-success">
+                            <i class="fas fa-user-plus"></i> Add User
+                        </button>
+                    </div>
+                    
+                    <div class="user-management" id="userManagementList">
+                        <!-- Users will be loaded here -->
+                        <div class="spinner" id="userManagementSpinner"></div>
+                    </div>
                 </div>
                 
-                <div id="allTab" class="tab-content">
-                    <table class="attendance-list">
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>QR #</th>
-                                <th>Status</th>
-                                <th>Time</th>
-                                <th>Details</th>
-                            </tr>
-                        </thead>
-                        <tbody id="allTableBody">
-                            <!-- All records will be added here dynamically -->
-                        </tbody>
-                    </table>
+                <div id="attendanceSection" class="section admin-section">
+                    <h1>Attendance Records</h1>
+                    
+                    <div class="attendance-tabs">
+                        <div class="attendance-tab active" data-tab="present">Present Today</div>
+                        <div class="attendance-tab" data-tab="absent">Absent Today</div>
+                        <div class="attendance-tab" data-tab="all">All Records</div>
+                    </div>
+                    
+                    <div id="presentTab" class="tab-content active">
+                        <table class="attendance-list">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>QR #</th>
+                                    <th>Time In</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="presentTableBody">
+                                <!-- Present records will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="absentTab" class="tab-content">
+                        <table class="attendance-list">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>QR #</th>
+                                    <th>Status</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="absentTableBody">
+                                <!-- Absent records will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="allTab" class="tab-content">
+                        <table class="attendance-list">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>QR #</th>
+                                    <th>Status</th>
+                                    <th>Time</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allTableBody">
+                                <!-- All records will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -741,47 +1037,46 @@
     
     <script>
         // DOM Elements
+        const loginModal = document.getElementById('loginModal');
+        const loginButton = document.getElementById('loginButton');
+        const loginUsername = document.getElementById('loginUsername');
+        const loginPassword = document.getElementById('loginPassword');
+        const loginError = document.getElementById('loginError');
+        const appContent = document.getElementById('appContent');
+        const logoutButton = document.getElementById('logoutButton');
+        
         const menuToggle = document.getElementById('menuToggle');
         const closeSidebar = document.getElementById('closeSidebar');
         const sidebar = document.getElementById('sidebar');
         const scanMenu = document.getElementById('scanMenu');
         const adminMenu = document.getElementById('adminMenu');
+        const userManagementMenu = document.getElementById('userManagementMenu');
         const attendanceMenu = document.getElementById('attendanceMenu');
-        const downloadApp = document.getElementById('downloadApp');
         const scanSection = document.getElementById('scanSection');
         const adminSection = document.getElementById('adminSection');
+        const userManagementSection = document.getElementById('userManagementSection');
         const attendanceSection = document.getElementById('attendanceSection');
         const startScanner = document.getElementById('startScanner');
         const switchCamera = document.getElementById('switchCamera');
         const scanner = document.getElementById('scanner');
+        const scannerOverlay = document.getElementById('scannerOverlay');
         const videoElement = document.getElementById('videoElement');
         const generateQR = document.getElementById('generateQR');
         const qrcodeDiv = document.getElementById('qrcode');
         const downloadQR = document.getElementById('downloadQR');
         const permissionOverlay = document.getElementById('permissionOverlay');
-        const allowCamera = document.getElementById('allowCamera');
-        const denyCamera = document.getElementById('denyCamera');
-        const storagePermissionOverlay = document.getElementById('storagePermissionOverlay');
-        const allowStorage = document.getElementById('allowStorage');
-        const denyStorage = document.getElementById('denyStorage');
-        const requestStorage = document.getElementById('requestStorage');
-        const storagePermissionSection = document.getElementById('storagePermissionSection');
+        const allowPermissions = document.getElementById('allowPermissions');
+        const denyPermissions = document.getElementById('denyPermissions');
         const manualEntry = document.getElementById('manualEntry');
         const manualQrNumber = document.getElementById('manualQrNumber');
         const manualPassword = document.getElementById('manualPassword');
         const manualSubmit = document.getElementById('manualSubmit');
         const qrNumberError = document.getElementById('qrNumberError');
         const passwordError = document.getElementById('passwordError');
-        const backupDatabase = document.getElementById('backupDatabase');
-        const restoreDatabase = document.getElementById('restoreDatabase');
-        const backupName = document.getElementById('backupName');
-        const databaseStatus = document.getElementById('databaseStatus');
-        const appDownloadModal = document.getElementById('appDownloadModal');
-        const downloadApk = document.getElementById('downloadApk');
-        const closeAppModal = document.getElementById('closeAppModal');
         
         // Profile Modal Elements
         const profileModal = document.getElementById('profileModal');
+        const modalClose = document.getElementById('modalClose');
         const modalUserName = document.getElementById('modalUserName');
         const modalUserPhoto = document.getElementById('modalUserPhoto');
         const modalQrNumber = document.getElementById('modalQrNumber');
@@ -791,273 +1086,176 @@
         const modalScanTime = document.getElementById('modalScanTime');
         const modalOk = document.getElementById('modalOk');
         
+        // Add User Modal Elements
+        const addUserModal = document.getElementById('addUserModal');
+        const addUserModalClose = document.getElementById('addUserModalClose');
+        const addUserButton = document.getElementById('addUserButton');
+        const newUserName = document.getElementById('newUserName');
+        const newUserAge = document.getElementById('newUserAge');
+        const newUserPhone = document.getElementById('newUserPhone');
+        const newUserAddress = document.getElementById('newUserAddress');
+        const newUserQrNumber = document.getElementById('newUserQrNumber');
+        const newUserPassword = document.getElementById('newUserPassword');
+        const newUserPhoto = document.getElementById('newUserPhoto');
+        const newUserPhotoName = document.getElementById('newUserPhotoName');
+        const saveUserButton = document.getElementById('saveUserButton');
+        const addUserError = document.getElementById('addUserError');
+        const userManagementList = document.getElementById('userManagementList');
+        const userManagementSpinner = document.getElementById('userManagementSpinner');
+        
         // Attendance tabs
         const attendanceTabs = document.querySelectorAll('.attendance-tab');
         
-        // Check if running in Android WebView
-        const isAndroidApp = navigator.userAgent.toLowerCase().includes('android') && 
-                            navigator.userAgent.toLowerCase().includes('wv');
+        // Initialize IndexedDB for local storage
+        let db;
+        const DB_NAME = 'MCGIAttendanceDB';
+        const DB_VERSION = 1;
+        const USER_STORE = 'users';
+        const ATTENDANCE_STORE = 'attendance';
+        const ADMIN_STORE = 'admin';
         
-        // QR code data storage (will be loaded from device storage)
-        let userDatabase = {
-            "1": {
-                name: "Jurex Aso",
-                age: 18,
-                phone: "09357269270",
-                address: "Pob. B Midsalip ZDS",
-                photo: "https://i.imgur.com/MDbk7n8.png",
-                password: "Jurex143"
-            },
-            "2": {
-                name: "Jane Smith",
-                age: 28,
-                phone: "555-987-6543",
-                address: "456 Oak Ave, Somewhere",
-                photo: "https://i.imgur.com/7GZ1l5n.jpg",
-                password: "pass2"
-            },
-            "3": {
-                name: "Robert Johnson",
-                age: 35,
-                phone: "555-456-7890",
-                address: "789 Pine Rd, Nowhere",
-                photo: "https://i.imgur.com/3JQ2X9c.jpg",
-                password: "pass3"
-            },
-            "4": {
-                name: "Emily Davis",
-                age: 25,
-                phone: "555-321-6547",
-                address: "321 Elm Blvd, Anywhere",
-                photo: "https://i.imgur.com/5M9hK7T.jpg",
-                password: "pass4"
+        // Open or create IndexedDB database
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        
+        request.onerror = function(event) {
+            console.error("Database error:", event.target.error);
+        };
+        
+        request.onupgradeneeded = function(event) {
+            db = event.target.result;
+            
+            // Create user store if it doesn't exist
+            if (!db.objectStoreNames.contains(USER_STORE)) {
+                const userStore = db.createObjectStore(USER_STORE, { keyPath: 'qrNumber' });
+                userStore.createIndex('name', 'name', { unique: false });
+                
+                // Add default users if needed
+                userStore.transaction.oncomplete = function() {
+                    const userTransaction = db.transaction(USER_STORE, 'readwrite');
+                    const userStore = userTransaction.objectStore(USER_STORE);
+                    
+                    // Add default admin user
+                    userStore.put({
+                        qrNumber: "0",
+                        name: "Admin User",
+                        age: 30,
+                        phone: "1234567890",
+                        address: "Admin Address",
+                        photo: "https://i.imgur.com/JK19XQ0.jpg",
+                        password: "admin123",
+                        isAdmin: true
+                    });
+                    
+                    // Add some sample users
+                    userStore.put({
+                        qrNumber: "1",
+                        name: "Jurex Aso",
+                        age: 18,
+                        phone: "09357269270",
+                        address: "Pob. B Midsalip ZDS",
+                        photo: "https://i.imgur.com/MDbk7n8.png",
+                        password: "Jurex143"
+                    });
+                    
+                    userStore.put({
+                        qrNumber: "2",
+                        name: "Jane Smith",
+                        age: 28,
+                        phone: "555-987-6543",
+                        address: "456 Oak Ave, Somewhere",
+                        photo: "https://i.imgur.com/7GZ1l5n.jpg",
+                        password: "pass2"
+                    });
+                };
+            }
+            
+            // Create attendance store if it doesn't exist
+            if (!db.objectStoreNames.contains(ATTENDANCE_STORE)) {
+                const attendanceStore = db.createObjectStore(ATTENDANCE_STORE, { autoIncrement: true });
+                attendanceStore.createIndex('qrNumber', 'qrNumber', { unique: false });
+                attendanceStore.createIndex('date', 'time', { unique: false });
+            }
+            
+            // Create admin store if it doesn't exist
+            if (!db.objectStoreNames.contains(ADMIN_STORE)) {
+                db.createObjectStore(ADMIN_STORE, { keyPath: 'username' });
             }
         };
         
-        let attendanceRecords = [];
-        let videoStream = null;
-        let scanning = false;
-        let animationFrameId = null;
-        let currentFacingMode = "user"; // Start with front camera
-        let hasStorageAccess = false;
-        
-        // Sample admin password (in a real app, this would be securely stored)
-        const ADMIN_PASSWORD = "admin123";
-        
-        // Initialize the app
-        function initApp() {
-            // Check if we're in an Android app
-            if (isAndroidApp) {
-                console.log("Running in Android WebView");
-                // Hide the download app button since we're already in the app
-                downloadApp.style.display = 'none';
-                
-                // Request storage permissions immediately in app
-                requestStorageAccess();
-            } else {
-                console.log("Running in browser");
-                // Show storage permission section for browser
-                storagePermissionSection.style.display = 'block';
-            }
+        request.onsuccess = function(event) {
+            db = event.target.result;
             
-            // Try to load database from storage
-            loadDatabase();
-        }
-        
-        // Request storage access
-        function requestStorageAccess() {
-            if (isAndroidApp) {
-                // In Android app, use the Android interface
-                try {
-                    Android.requestStoragePermission();
-                } catch (e) {
-                    console.error("Android interface not available:", e);
-                    alert("Storage access not available in this environment");
+            // Check if admin credentials exist, if not add default
+            const adminTransaction = db.transaction(ADMIN_STORE, 'readwrite');
+            const adminStore = adminTransaction.objectStore(ADMIN_STORE);
+            const request = adminStore.get('admin');
+            
+            request.onsuccess = function() {
+                if (!request.result) {
+                    adminStore.put({
+                        username: 'admin',
+                        password: 'admin123',
+                        name: 'System Administrator'
+                    });
                 }
-            } else {
-                // In browser, show the permission overlay
-                storagePermissionOverlay.style.display = 'flex';
-            }
-        }
-        
-        // Handle storage permission granted
-        function onStoragePermissionGranted() {
-            console.log("Storage permission granted");
-            hasStorageAccess = true;
-            storagePermissionSection.style.display = 'none';
-            storagePermissionOverlay.style.display = 'none';
-            
-            // Load database from storage
-            loadDatabase();
-        }
-        
-        // Load database from device storage
-        function loadDatabase() {
-            if (!hasStorageAccess) return;
-            
-            if (isAndroidApp) {
-                // In Android app, get data from Android storage
-                try {
-                    const dbJson = Android.loadDatabase();
-                    if (dbJson) {
-                        const data = JSON.parse(dbJson);
-                        userDatabase = data.userDatabase || userDatabase;
-                        attendanceRecords = data.attendanceRecords || attendanceRecords;
-                        console.log("Database loaded from Android storage");
-                    }
-                } catch (e) {
-                    console.error("Error loading from Android storage:", e);
-                }
-            } else {
-                // In browser, use localStorage
-                const dbJson = localStorage.getItem('attendanceDatabase');
-                if (dbJson) {
-                    const data = JSON.parse(dbJson);
-                    userDatabase = data.userDatabase || userDatabase;
-                    attendanceRecords = data.attendanceRecords || attendanceRecords;
-                    console.log("Database loaded from localStorage");
-                }
-            }
-        }
-        
-        // Save database to device storage
-        function saveDatabase() {
-            if (!hasStorageAccess) return;
-            
-            const data = {
-                userDatabase,
-                attendanceRecords,
-                lastUpdated: new Date().toISOString()
             };
-            
-            if (isAndroidApp) {
-                // In Android app, save to Android storage
-                try {
-                    Android.saveDatabase(JSON.stringify(data));
-                    console.log("Database saved to Android storage");
-                } catch (e) {
-                    console.error("Error saving to Android storage:", e);
-                }
-            } else {
-                // In browser, use localStorage
-                localStorage.setItem('attendanceDatabase', JSON.stringify(data));
-                console.log("Database saved to localStorage");
-            }
-        }
+        };
         
-        // Backup database to file
-        function backupDatabaseToFile() {
-            if (!hasStorageAccess) {
-                alert("Storage access not granted. Please grant storage access first.");
+        // Login functionality
+        loginButton.addEventListener('click', () => {
+            const username = loginUsername.value.trim();
+            const password = loginPassword.value.trim();
+            
+            if (!username || !password) {
+                loginError.textContent = 'Please enter both username and password';
                 return;
             }
             
-            const backupFileName = backupName.value || `attendance_backup_${new Date().toISOString().slice(0,10)}.json`;
-            const data = {
-                userDatabase,
-                attendanceRecords,
-                backupDate: new Date().toISOString()
-            };
+            const transaction = db.transaction([ADMIN_STORE], 'readonly');
+            const adminStore = transaction.objectStore(ADMIN_STORE);
+            const request = adminStore.get(username);
             
-            if (isAndroidApp) {
-                // In Android app, use the Android interface
-                try {
-                    Android.backupDatabase(backupFileName, JSON.stringify(data));
-                    databaseStatus.textContent = `Backup saved as ${backupFileName}`;
-                    setTimeout(() => databaseStatus.textContent = '', 3000);
-                } catch (e) {
-                    console.error("Error backing up in Android:", e);
-                    databaseStatus.textContent = "Backup failed";
-                    setTimeout(() => databaseStatus.textContent = '', 3000);
-                }
-            } else {
-                // In browser, create download link
-                const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = backupFileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+            request.onsuccess = function() {
+                const admin = request.result;
                 
-                databaseStatus.textContent = `Backup saved as ${backupFileName}`;
-                setTimeout(() => databaseStatus.textContent = '', 3000);
-            }
-        }
-        
-        // Restore database from file
-        function restoreDatabaseFromFile() {
-            if (!hasStorageAccess) {
-                alert("Storage access not granted. Please grant storage access first.");
-                return;
-            }
-            
-            if (isAndroidApp) {
-                // In Android app, trigger file picker
-                try {
-                    Android.restoreDatabase();
-                } catch (e) {
-                    console.error("Error restoring in Android:", e);
-                    databaseStatus.textContent = "Restore failed";
-                    setTimeout(() => databaseStatus.textContent = '', 3000);
-                }
-            } else {
-                // In browser, use file input
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json';
-                input.onchange = e => {
-                    const file = e.target.files[0];
-                    if (!file) return;
+                if (admin && admin.password === password) {
+                    // Successful login
+                    loginModal.style.display = 'none';
+                    appContent.style.display = 'block';
                     
-                    const reader = new FileReader();
-                    reader.onload = event => {
-                        try {
-                            const data = JSON.parse(event.target.result);
-                            if (data.userDatabase && data.attendanceRecords) {
-                                userDatabase = data.userDatabase;
-                                attendanceRecords = data.attendanceRecords;
-                                saveDatabase();
-                                updateAttendanceTables();
-                                databaseStatus.textContent = "Database restored successfully";
-                                setTimeout(() => databaseStatus.textContent = '', 3000);
-                            } else {
-                                throw new Error("Invalid backup file format");
-                            }
-                        } catch (err) {
-                            console.error("Error parsing backup file:", err);
-                            databaseStatus.textContent = "Invalid backup file";
-                            setTimeout(() => databaseStatus.textContent = '', 3000);
-                        }
-                    };
-                    reader.readAsText(file);
-                };
-                input.click();
-            }
-        }
-        
-        // Handle database restored from Android
-        function onDatabaseRestored(dbJson) {
-            try {
-                const data = JSON.parse(dbJson);
-                if (data.userDatabase && data.attendanceRecords) {
-                    userDatabase = data.userDatabase;
-                    attendanceRecords = data.attendanceRecords;
-                    saveDatabase();
-                    updateAttendanceTables();
-                    databaseStatus.textContent = "Database restored successfully";
-                    setTimeout(() => databaseStatus.textContent = '', 3000);
+                    // Request permissions
+                    permissionOverlay.style.display = 'flex';
                 } else {
-                    throw new Error("Invalid backup file format");
+                    loginError.textContent = 'Invalid username or password';
                 }
-            } catch (err) {
-                console.error("Error parsing restored database:", err);
-                databaseStatus.textContent = "Invalid backup file";
-                setTimeout(() => databaseStatus.textContent = '', 3000);
-            }
-        }
+            };
+            
+            request.onerror = function() {
+                loginError.textContent = 'Error accessing database';
+            };
+        });
+        
+        // Logout functionality
+        logoutButton.addEventListener('click', () => {
+            // Hide app content and show login modal
+            appContent.style.display = 'none';
+            loginModal.style.display = 'flex';
+            
+            // Clear login fields
+            loginUsername.value = '';
+            loginPassword.value = '';
+            loginError.textContent = '';
+            
+            // Stop scanner if running
+            stopScanner();
+            
+            // Reset UI to scan section
+            scanSection.style.display = 'block';
+            adminSection.style.display = 'none';
+            userManagementSection.style.display = 'none';
+            attendanceSection.style.display = 'none';
+            sidebar.classList.remove('open');
+        });
         
         // Menu toggle
         menuToggle.addEventListener('click', () => {
@@ -1073,69 +1271,208 @@
             e.preventDefault();
             scanSection.style.display = 'block';
             adminSection.style.display = 'none';
+            userManagementSection.style.display = 'none';
             attendanceSection.style.display = 'none';
             sidebar.classList.remove('open');
         });
         
         adminMenu.addEventListener('click', (e) => {
             e.preventDefault();
-            const password = prompt("Enter admin password:");
-            if (password === ADMIN_PASSWORD) {
-                scanSection.style.display = 'none';
-                adminSection.style.display = 'block';
-                attendanceSection.style.display = 'none';
-                sidebar.classList.remove('open');
-            } else {
-                alert("Incorrect password!");
-            }
+            scanSection.style.display = 'none';
+            adminSection.style.display = 'block';
+            userManagementSection.style.display = 'none';
+            attendanceSection.style.display = 'none';
+            sidebar.classList.remove('open');
+        });
+        
+        userManagementMenu.addEventListener('click', (e) => {
+            e.preventDefault();
+            scanSection.style.display = 'none';
+            adminSection.style.display = 'none';
+            userManagementSection.style.display = 'block';
+            attendanceSection.style.display = 'none';
+            sidebar.classList.remove('open');
+            loadUserManagementList();
         });
         
         attendanceMenu.addEventListener('click', (e) => {
             e.preventDefault();
-            const password = prompt("Enter admin password:");
-            if (password === ADMIN_PASSWORD) {
-                scanSection.style.display = 'none';
-                adminSection.style.display = 'none';
-                attendanceSection.style.display = 'block';
-                updateAttendanceTables();
-                sidebar.classList.remove('open');
-            } else {
-                alert("Incorrect password!");
-            }
-        });
-        
-        downloadApp.addEventListener('click', (e) => {
-            e.preventDefault();
-            appDownloadModal.style.display = 'flex';
+            scanSection.style.display = 'none';
+            adminSection.style.display = 'none';
+            userManagementSection.style.display = 'none';
+            attendanceSection.style.display = 'block';
+            updateAttendanceTables();
             sidebar.classList.remove('open');
         });
         
-        // Close app download modal
-        closeAppModal.addEventListener('click', () => {
-            appDownloadModal.style.display = 'none';
+        // Load user management list
+        function loadUserManagementList() {
+            userManagementList.innerHTML = '';
+            userManagementSpinner.style.display = 'block';
+            
+            const transaction = db.transaction([USER_STORE], 'readonly');
+            const userStore = transaction.objectStore(USER_STORE);
+            const request = userStore.getAll();
+            
+            request.onsuccess = function() {
+                userManagementSpinner.style.display = 'none';
+                const users = request.result;
+                
+                if (users.length === 0) {
+                    userManagementList.innerHTML = '<p>No users found. Add a new user to get started.</p>';
+                    return;
+                }
+                
+                // Filter out admin users
+                const nonAdminUsers = users.filter(user => !user.isAdmin);
+                
+                nonAdminUsers.forEach(user => {
+                    const userCard = document.createElement('div');
+                    userCard.className = 'user-card';
+                    userCard.innerHTML = `
+                        <img src="${user.photo}" class="user-card-photo" alt="${user.name}">
+                        <div class="user-card-info">
+                            <div class="user-card-name">${user.name}</div>
+                            <div class="user-card-qr">QR Code: ${user.qrNumber}</div>
+                        </div>
+                        <div class="user-card-actions">
+                            <button class="btn btn-danger" data-qr="${user.qrNumber}" onclick="deleteUser('${user.qrNumber}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    userManagementList.appendChild(userCard);
+                });
+            };
+            
+            request.onerror = function() {
+                userManagementSpinner.style.display = 'none';
+                userManagementList.innerHTML = '<p>Error loading users. Please try again.</p>';
+            };
+        }
+        
+        // Delete user function (accessible in global scope for onclick)
+        window.deleteUser = function(qrNumber) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                const transaction = db.transaction([USER_STORE], 'readwrite');
+                const userStore = transaction.objectStore(USER_STORE);
+                const request = userStore.delete(qrNumber);
+                
+                request.onsuccess = function() {
+                    loadUserManagementList();
+                };
+                
+                request.onerror = function() {
+                    alert('Error deleting user');
+                };
+            }
+        };
+        
+        // Add user modal
+        addUserButton.addEventListener('click', () => {
+            // Clear the form
+            newUserName.value = '';
+            newUserAge.value = '';
+            newUserPhone.value = '';
+            newUserAddress.value = '';
+            newUserQrNumber.value = '';
+            newUserPassword.value = '';
+            newUserPhotoName.textContent = 'No file selected';
+            addUserError.textContent = '';
+            
+            addUserModal.style.display = 'flex';
         });
         
-        // Download APK
-        downloadApk.addEventListener('click', () => {
-            // Replace with your actual APK download URL
-            const apkUrl = 'https://example.com/path/to/your/app.apk';
-            
-            if (isAndroidApp) {
-                // In Android app, use the Android interface
-                try {
-                    Android.downloadFile(apkUrl, 'MCGIAttendance.apk');
-                } catch (e) {
-                    console.error("Android interface not available:", e);
-                    // Fallback to browser download
-                    window.open(apkUrl, '_blank');
-                }
+        addUserModalClose.addEventListener('click', () => {
+            addUserModal.style.display = 'none';
+        });
+        
+        // File upload display
+        newUserPhoto.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                newUserPhotoName.textContent = this.files[0].name;
             } else {
-                // In browser, open download link
-                window.open(apkUrl, '_blank');
+                newUserPhotoName.textContent = 'No file selected';
+            }
+        });
+        
+        // Save new user
+        saveUserButton.addEventListener('click', () => {
+            const name = newUserName.value.trim();
+            const age = newUserAge.value.trim();
+            const phone = newUserPhone.value.trim();
+            const address = newUserAddress.value.trim();
+            const qrNumber = newUserQrNumber.value.trim();
+            const password = newUserPassword.value.trim();
+            const photoFile = newUserPhoto.files[0];
+            
+            // Validate inputs
+            if (!name || !age || !qrNumber || !password) {
+                addUserError.textContent = 'Please fill in all required fields';
+                return;
             }
             
-            appDownloadModal.style.display = 'none';
+            if (isNaN(qrNumber)) {
+                addUserError.textContent = 'QR Code must be a number';
+                return;
+            }
+            
+            // Check if QR number already exists
+            const transaction = db.transaction([USER_STORE], 'readonly');
+            const userStore = transaction.objectStore(USER_STORE);
+            const request = userStore.get(qrNumber);
+            
+            request.onsuccess = function() {
+                if (request.result) {
+                    addUserError.textContent = 'QR Code number already exists';
+                    return;
+                }
+                
+                // Process photo if uploaded
+                let photoUrl = "https://i.imgur.com/JK19XQ0.jpg"; // Default photo
+                
+                if (photoFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        photoUrl = e.target.result;
+                        saveUserToDB(name, age, phone, address, qrNumber, password, photoUrl);
+                    };
+                    reader.readAsDataURL(photoFile);
+                } else {
+                    saveUserToDB(name, age, phone, address, qrNumber, password, photoUrl);
+                }
+            };
+            
+            request.onerror = function() {
+                addUserError.textContent = 'Error checking QR code';
+            };
         });
+        
+        function saveUserToDB(name, age, phone, address, qrNumber, password, photoUrl) {
+            const transaction = db.transaction([USER_STORE], 'readwrite');
+            const userStore = transaction.objectStore(USER_STORE);
+            
+            const user = {
+                qrNumber: qrNumber,
+                name: name,
+                age: age,
+                phone: phone,
+                address: address,
+                photo: photoUrl,
+                password: password
+            };
+            
+            const request = userStore.add(user);
+            
+            request.onsuccess = function() {
+                addUserModal.style.display = 'none';
+                loadUserManagementList();
+            };
+            
+            request.onerror = function() {
+                addUserError.textContent = 'Error saving user to database';
+            };
+        }
         
         // Attendance tabs functionality
         attendanceTabs.forEach(tab => {
@@ -1161,34 +1498,31 @@
             permissionOverlay.style.display = 'flex';
         });
         
-        allowCamera.addEventListener('click', () => {
+        allowPermissions.addEventListener('click', () => {
             permissionOverlay.style.display = 'none';
-            initScanner();
+            
+            // Request camera and storage permissions
+            if (navigator.permissions) {
+                Promise.all([
+                    navigator.permissions.query({ name: 'camera' }),
+                    navigator.permissions.query({ name: 'geolocation' }),
+                    navigator.permissions.query({ name: 'notifications' })
+                ]).then(results => {
+                    initScanner();
+                }).catch(err => {
+                    console.error("Permission error:", err);
+                    initScanner(); // Try anyway
+                });
+            } else {
+                initScanner(); // Older browsers
+            }
         });
         
-        denyCamera.addEventListener('click', () => {
+        denyPermissions.addEventListener('click', () => {
             permissionOverlay.style.display = 'none';
-            scanner.innerHTML = '<p>Camera access denied. You can manually enter QR details below.</p>';
+            scannerOverlay.innerHTML = '<p>Camera access denied. You can manually enter QR details below.</p>';
             manualEntry.style.display = 'block';
         });
-        
-        // Storage permission
-        requestStorage.addEventListener('click', () => {
-            requestStorageAccess();
-        });
-        
-        allowStorage.addEventListener('click', () => {
-            onStoragePermissionGranted();
-        });
-        
-        denyStorage.addEventListener('click', () => {
-            storagePermissionOverlay.style.display = 'none';
-            alert("Storage access is required for full functionality. You can grant access later.");
-        });
-        
-        // Database backup/restore
-        backupDatabase.addEventListener('click', backupDatabaseToFile);
-        restoreDatabase.addEventListener('click', restoreDatabaseFromFile);
         
         // Switch camera button
         switchCamera.addEventListener('click', () => {
@@ -1198,6 +1532,11 @@
         });
         
         // QR Code Scanner
+        let videoStream = null;
+        let scanning = false;
+        let animationFrameId = null;
+        let currentFacingMode = "user"; // Start with front camera
+        
         function initScanner() {
             const constraints = {
                 video: { 
@@ -1212,7 +1551,7 @@
                     videoStream = stream;
                     videoElement.srcObject = stream;
                     videoElement.style.display = 'block';
-                    scanner.querySelector('p').style.display = 'none';
+                    scannerOverlay.style.display = 'none';
                     switchCamera.classList.remove('hidden');
                     
                     videoElement.play();
@@ -1222,7 +1561,7 @@
                 })
                 .catch(function(err) {
                     console.error("Error accessing camera: ", err);
-                    scanner.innerHTML = '<p>Could not access camera. You can manually enter QR details below.</p>';
+                    scannerOverlay.innerHTML = '<p>Could not access camera. You can manually enter QR details below.</p>';
                     manualEntry.style.display = 'block';
                 });
         }
@@ -1260,7 +1599,7 @@
                 videoStream.getTracks().forEach(track => track.stop());
                 videoElement.srcObject = null;
                 videoElement.style.display = 'none';
-                scanner.querySelector('p').style.display = 'block';
+                scannerOverlay.style.display = 'flex';
                 switchCamera.classList.add('hidden');
             }
         }
@@ -1277,49 +1616,68 @@
         
         function processQRData(parsedData) {
             // Check if this is a valid QR code from our system
-            if (parsedData.qrNumber && userDatabase[parsedData.qrNumber]) {
-                const user = userDatabase[parsedData.qrNumber];
+            if (parsedData.qrNumber) {
+                const transaction = db.transaction([USER_STORE], 'readonly');
+                const userStore = transaction.objectStore(USER_STORE);
+                const request = userStore.get(parsedData.qrNumber);
                 
-                // Verify password if provided in QR code
-                if (parsedData.password && parsedData.password !== user.password) {
-                    alert("Invalid password in QR code!");
-                    return;
-                }
-                
-                const now = new Date();
-                
-                // Show profile in modal
-                showProfileModal({
-                    name: user.name,
-                    photo: user.photo,
-                    qrNumber: parsedData.qrNumber,
-                    age: user.age,
-                    phone: user.phone,
-                    address: user.address,
-                    time: now
-                });
-                
-                // Add to attendance records if not already present for today
-                const today = new Date().toDateString();
-                const alreadyRecorded = attendanceRecords.some(record => 
-                    record.qrNumber === parsedData.qrNumber && 
-                    record.time.toDateString() === today
-                );
-                
-                if (!alreadyRecorded) {
-                    attendanceRecords.push({
-                        qrNumber: parsedData.qrNumber,
+                request.onsuccess = function() {
+                    const user = request.result;
+                    
+                    if (!user) {
+                        alert("Invalid QR Code. User not found.");
+                        return;
+                    }
+                    
+                    // Verify password if provided in QR code
+                    if (parsedData.password && parsedData.password !== user.password) {
+                        alert("Invalid password in QR code!");
+                        return;
+                    }
+                    
+                    const now = new Date();
+                    
+                    // Show profile in modal
+                    showProfileModal({
                         name: user.name,
-                        time: now,
+                        photo: user.photo,
+                        qrNumber: parsedData.qrNumber,
                         age: user.age,
                         phone: user.phone,
                         address: user.address,
-                        photo: user.photo
+                        time: now
                     });
                     
-                    // Save to database
-                    saveDatabase();
-                }
+                    // Add to attendance records if not already present for today
+                    const today = new Date().toDateString();
+                    const attendanceTransaction = db.transaction([ATTENDANCE_STORE], 'readonly');
+                    const attendanceStore = attendanceTransaction.objectStore(ATTENDANCE_STORE);
+                    const index = attendanceStore.index('qrNumber');
+                    const request = index.getAll(parsedData.qrNumber);
+                    
+                    request.onsuccess = function() {
+                        const records = request.result;
+                        const alreadyRecorded = records.some(record => 
+                            new Date(record.time).toDateString() === today
+                        );
+                        
+                        if (!alreadyRecorded) {
+                            // Add new attendance record
+                            const addTransaction = db.transaction([ATTENDANCE_STORE], 'readwrite');
+                            const addStore = addTransaction.objectStore(ATTENDANCE_STORE);
+                            
+                            addStore.add({
+                                qrNumber: parsedData.qrNumber,
+                                name: user.name,
+                                time: now,
+                                age: user.age,
+                                phone: user.phone,
+                                address: user.address,
+                                photo: user.photo
+                            });
+                        }
+                    };
+                };
                 
                 // Stop scanning temporarily
                 stopScanner();
@@ -1346,6 +1704,11 @@
             initScanner(); // Restart the scanner
         });
         
+        modalClose.addEventListener('click', () => {
+            profileModal.style.display = 'none';
+            initScanner(); // Restart the scanner
+        });
+        
         // Manual entry submission
         manualSubmit.addEventListener('click', () => {
             qrNumberError.textContent = '';
@@ -1364,55 +1727,70 @@
                 return;
             }
             
-            if (!userDatabase[qrNum]) {
-                qrNumberError.textContent = 'Invalid QR Code number';
-                return;
-            }
+            const transaction = db.transaction([USER_STORE], 'readonly');
+            const userStore = transaction.objectStore(USER_STORE);
+            const request = userStore.get(qrNum);
             
-            if (userDatabase[qrNum].password !== password) {
-                passwordError.textContent = 'Incorrect password';
-                return;
-            }
-            
-            // Process the manual entry
-            const now = new Date();
-            const user = userDatabase[qrNum];
-            
-            showProfileModal({
-                name: user.name,
-                photo: user.photo,
-                qrNumber: qrNum,
-                age: user.age,
-                phone: user.phone,
-                address: user.address,
-                time: now
-            });
-            
-            // Add to attendance records if not already present for today
-            const today = new Date().toDateString();
-            const alreadyRecorded = attendanceRecords.some(record => 
-                record.qrNumber === qrNum && 
-                record.time.toDateString() === today
-            );
-            
-            if (!alreadyRecorded) {
-                attendanceRecords.push({
-                    qrNumber: qrNum,
+            request.onsuccess = function() {
+                const user = request.result;
+                
+                if (!user) {
+                    qrNumberError.textContent = 'Invalid QR Code number';
+                    return;
+                }
+                
+                if (user.password !== password) {
+                    passwordError.textContent = 'Incorrect password';
+                    return;
+                }
+                
+                // Process the manual entry
+                const now = new Date();
+                
+                showProfileModal({
                     name: user.name,
-                    time: now,
+                    photo: user.photo,
+                    qrNumber: qrNum,
                     age: user.age,
                     phone: user.phone,
                     address: user.address,
-                    photo: user.photo
+                    time: now
                 });
                 
-                // Save to database
-                saveDatabase();
-            }
-            
-            // Clear the form
-            manualQrNumber.value = '';
-            manualPassword.value = '';
+                // Add to attendance records if not already present for today
+                const today = new Date().toDateString();
+                const attendanceTransaction = db.transaction([ATTENDANCE_STORE], 'readonly');
+                const attendanceStore = attendanceTransaction.objectStore(ATTENDANCE_STORE);
+                const index = attendanceStore.index('qrNumber');
+                const request = index.getAll(qrNum);
+                
+                request.onsuccess = function() {
+                    const records = request.result;
+                    const alreadyRecorded = records.some(record => 
+                        new Date(record.time).toDateString() === today
+                    );
+                    
+                    if (!alreadyRecorded) {
+                        // Add new attendance record
+                        const addTransaction = db.transaction([ATTENDANCE_STORE], 'readwrite');
+                        const addStore = addTransaction.objectStore(ATTENDANCE_STORE);
+                        
+                        addStore.add({
+                            qrNumber: qrNum,
+                            name: user.name,
+                            time: now,
+                            age: user.age,
+                            phone: user.phone,
+                            address: user.address,
+                            photo: user.photo
+                        });
+                    }
+                };
+                
+                // Clear the form
+                manualQrNumber.value = '';
+                manualPassword.value = '';
+            };
         });
         
         // QR Code Generator
@@ -1426,36 +1804,44 @@
             }
             
             // Check if this QR number exists in our database
-            if (!userDatabase[qrNum]) {
-                alert(`Error: No user data found for QR code #${qrNum}. Please add user data first.`);
-                return;
-            }
+            const transaction = db.transaction([USER_STORE], 'readonly');
+            const userStore = transaction.objectStore(USER_STORE);
+            const request = userStore.get(qrNum);
             
-            // Generate QR code with encrypted data
-            const qrContent = JSON.stringify({
-                qrNumber: qrNum,
-                password: password
-            });
-            
-            qrcodeDiv.innerHTML = '';
-            QRCode.toCanvas(qrcodeDiv, qrContent, { width: 200 }, (error) => {
-                if (error) {
-                    console.error(error);
-                    alert("Error generating QR code!");
-                } else {
-                    qrcodeDiv.style.display = 'block';
-                    downloadQR.classList.remove('hidden');
-                    
-                    // Set up download button
-                    downloadQR.onclick = () => {
-                        const canvas = qrcodeDiv.querySelector('canvas');
-                        const link = document.createElement('a');
-                        link.download = `qr-attendance-${qrNum}.png`;
-                        link.href = canvas.toDataURL('image/png');
-                        link.click();
-                    };
+            request.onsuccess = function() {
+                const user = request.result;
+                
+                if (!user) {
+                    alert(`Error: No user data found for QR code #${qrNum}. Please add the user first.`);
+                    return;
                 }
-            });
+                
+                // Generate QR code with encrypted data
+                const qrContent = JSON.stringify({
+                    qrNumber: qrNum,
+                    password: password
+                });
+                
+                qrcodeDiv.innerHTML = '';
+                QRCode.toCanvas(qrcodeDiv, qrContent, { width: 200 }, (error) => {
+                    if (error) {
+                        console.error(error);
+                        alert("Error generating QR code!");
+                    } else {
+                        qrcodeDiv.style.display = 'block';
+                        downloadQR.classList.remove('hidden');
+                        
+                        // Set up download button
+                        downloadQR.onclick = () => {
+                            const canvas = qrcodeDiv.querySelector('canvas');
+                            const link = document.createElement('a');
+                            link.download = `qr-attendance-${qrNum}.png`;
+                            link.href = canvas.toDataURL('image/png');
+                            link.click();
+                        };
+                    }
+                });
+            };
         });
         
         // Update all attendance tables
@@ -1471,50 +1857,63 @@
             tableBody.innerHTML = '';
             
             const today = new Date().toDateString();
-            const todayRecords = attendanceRecords.filter(record => 
-                record.time.toDateString() === today
-            );
             
-            // Sort by most recent first
-            const sortedRecords = [...todayRecords].sort((a, b) => b.time - a.time);
+            const transaction = db.transaction([ATTENDANCE_STORE], 'readonly');
+            const attendanceStore = transaction.objectStore(ATTENDANCE_STORE);
+            const index = attendanceStore.index('date');
+            const range = IDBKeyRange.lowerBound(new Date(new Date().setHours(0, 0, 0, 0)));
+            const request = index.getAll(range);
             
-            sortedRecords.forEach(record => {
-                const row = document.createElement('tr');
+            request.onsuccess = function() {
+                const todayRecords = request.result;
                 
-                // User cell with avatar and name
-                const userCell = document.createElement('td');
-                userCell.className = 'user-cell';
-                userCell.innerHTML = `
-                    <img src="${record.photo}" class="user-avatar" alt="${record.name}">
-                    <span class="user-name">${record.name}</span>
-                `;
-                row.appendChild(userCell);
+                if (todayRecords.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No attendance records for today</td></tr>';
+                    return;
+                }
                 
-                // QR Number cell
-                const qrCell = document.createElement('td');
-                qrCell.textContent = record.qrNumber;
-                row.appendChild(qrCell);
+                // Sort by most recent first
+                const sortedRecords = [...todayRecords].sort((a, b) => new Date(b.time) - new Date(a.time));
                 
-                // Time cell with formatted time
-                const timeCell = document.createElement('td');
-                timeCell.className = 'time-cell';
-                timeCell.innerHTML = `
-                    <div>${record.time.toLocaleDateString()}</div>
-                    <div class="time-in">${record.time.toLocaleTimeString()}</div>
-                `;
-                row.appendChild(timeCell);
-                
-                // Details cell
-                const detailsCell = document.createElement('td');
-                detailsCell.innerHTML = `
-                    <div><strong>Age:</strong> ${record.age}</div>
-                    <div><strong>Phone:</strong> ${record.phone}</div>
-                    <div><strong>Address:</strong> ${record.address}</div>
-                `;
-                row.appendChild(detailsCell);
-                
-                tableBody.appendChild(row);
-            });
+                sortedRecords.forEach(record => {
+                    const row = document.createElement('tr');
+                    
+                    // User cell with avatar and name
+                    const userCell = document.createElement('td');
+                    userCell.className = 'user-cell';
+                    userCell.innerHTML = `
+                        <img src="${record.photo}" class="user-avatar" alt="${record.name}">
+                        <span class="user-name">${record.name}</span>
+                    `;
+                    row.appendChild(userCell);
+                    
+                    // QR Number cell
+                    const qrCell = document.createElement('td');
+                    qrCell.textContent = record.qrNumber;
+                    row.appendChild(qrCell);
+                    
+                    // Time cell with formatted time
+                    const timeCell = document.createElement('td');
+                    timeCell.className = 'time-cell';
+                    const recordTime = new Date(record.time);
+                    timeCell.innerHTML = `
+                        <div>${recordTime.toLocaleDateString()}</div>
+                        <div class="time-in">${recordTime.toLocaleTimeString()}</div>
+                    `;
+                    row.appendChild(timeCell);
+                    
+                    // Details cell
+                    const detailsCell = document.createElement('td');
+                    detailsCell.innerHTML = `
+                        <div><strong>Age:</strong> ${record.age}</div>
+                        <div><strong>Phone:</strong> ${record.phone}</div>
+                        <div><strong>Address:</strong> ${record.address}</div>
+                    `;
+                    row.appendChild(detailsCell);
+                    
+                    tableBody.appendChild(row);
+                });
+            };
         }
         
         // Update absent table
@@ -1523,49 +1922,71 @@
             tableBody.innerHTML = '';
             
             const today = new Date().toDateString();
-            const presentQrNumbers = attendanceRecords
-                .filter(record => record.time.toDateString() === today)
-                .map(record => record.qrNumber);
             
-            // Find all registered users who are not present today
-            const absentUsers = Object.keys(userDatabase).filter(qrNum => 
-                !presentQrNumbers.includes(qrNum)
-            );
+            // First get all attendance records for today
+            const attendanceTransaction = db.transaction([ATTENDANCE_STORE], 'readonly');
+            const attendanceStore = attendanceTransaction.objectStore(ATTENDANCE_STORE);
+            const index = attendanceStore.index('date');
+            const range = IDBKeyRange.lowerBound(new Date(new Date().setHours(0, 0, 0, 0)));
+            const attendanceRequest = index.getAll(range);
             
-            absentUsers.forEach(qrNum => {
-                const user = userDatabase[qrNum];
-                const row = document.createElement('tr');
+            attendanceRequest.onsuccess = function() {
+                const todayRecords = attendanceRequest.result;
+                const presentQrNumbers = todayRecords.map(record => record.qrNumber);
                 
-                // User cell with avatar and name
-                const userCell = document.createElement('td');
-                userCell.className = 'user-cell';
-                userCell.innerHTML = `
-                    <img src="${user.photo}" class="user-avatar" alt="${user.name}">
-                    <span class="user-name">${user.name}</span>
-                `;
-                row.appendChild(userCell);
+                // Now get all users to find who's absent
+                const userTransaction = db.transaction([USER_STORE], 'readonly');
+                const userStore = userTransaction.objectStore(USER_STORE);
+                const userRequest = userStore.getAll();
                 
-                // QR Number cell
-                const qrCell = document.createElement('td');
-                qrCell.textContent = qrNum;
-                row.appendChild(qrCell);
-                
-                // Status cell
-                const statusCell = document.createElement('td');
-                statusCell.innerHTML = `<span class="absent">Absent</span>`;
-                row.appendChild(statusCell);
-                
-                // Details cell
-                const detailsCell = document.createElement('td');
-                detailsCell.innerHTML = `
-                    <div><strong>Age:</strong> ${user.age}</div>
-                    <div><strong>Phone:</strong> ${user.phone}</div>
-                    <div><strong>Address:</strong> ${user.address}</div>
-                `;
-                row.appendChild(detailsCell);
-                
-                tableBody.appendChild(row);
-            });
+                userRequest.onsuccess = function() {
+                    const allUsers = userRequest.result;
+                    
+                    // Find all registered users who are not present today (and not admin)
+                    const absentUsers = allUsers.filter(user => 
+                        !presentQrNumbers.includes(user.qrNumber) && !user.isAdmin
+                    );
+                    
+                    if (absentUsers.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No absent members today</td></tr>';
+                        return;
+                    }
+                    
+                    absentUsers.forEach(user => {
+                        const row = document.createElement('tr');
+                        
+                        // User cell with avatar and name
+                        const userCell = document.createElement('td');
+                        userCell.className = 'user-cell';
+                        userCell.innerHTML = `
+                            <img src="${user.photo}" class="user-avatar" alt="${user.name}">
+                            <span class="user-name">${user.name}</span>
+                        `;
+                        row.appendChild(userCell);
+                        
+                        // QR Number cell
+                        const qrCell = document.createElement('td');
+                        qrCell.textContent = user.qrNumber;
+                        row.appendChild(qrCell);
+                        
+                        // Status cell
+                        const statusCell = document.createElement('td');
+                        statusCell.innerHTML = `<span class="absent">Absent</span>`;
+                        row.appendChild(statusCell);
+                        
+                        // Details cell
+                        const detailsCell = document.createElement('td');
+                        detailsCell.innerHTML = `
+                            <div><strong>Age:</strong> ${user.age}</div>
+                            <div><strong>Phone:</strong> ${user.phone}</div>
+                            <div><strong>Address:</strong> ${user.address}</div>
+                        `;
+                        row.appendChild(detailsCell);
+                        
+                        tableBody.appendChild(row);
+                    });
+                };
+            };
         }
         
         // Update all records table (shows both present and absent users)
@@ -1574,99 +1995,113 @@
             tableBody.innerHTML = '';
             
             const today = new Date().toDateString();
-            const presentQrNumbers = attendanceRecords
-                .filter(record => record.time.toDateString() === today)
-                .map(record => record.qrNumber);
             
-            // Combine all users with their status
-            const allUsers = Object.keys(userDatabase).map(qrNum => {
-                const user = userDatabase[qrNum];
-                const isPresent = presentQrNumbers.includes(qrNum);
-                const record = attendanceRecords.find(r => 
-                    r.qrNumber === qrNum && r.time.toDateString() === today
-                );
+            // First get all attendance records
+            const attendanceTransaction = db.transaction([ATTENDANCE_STORE], 'readonly');
+            const attendanceStore = attendanceTransaction.objectStore(ATTENDANCE_STORE);
+            const attendanceRequest = attendanceStore.getAll();
+            
+            attendanceRequest.onsuccess = function() {
+                const allAttendanceRecords = attendanceRequest.result;
                 
-                return {
-                    qrNumber: qrNum,
-                    name: user.name,
-                    photo: user.photo,
-                    age: user.age,
-                    phone: user.phone,
-                    address: user.address,
-                    isPresent: isPresent,
-                    time: isPresent ? record.time : null
+                // Get all users
+                const userTransaction = db.transaction([USER_STORE], 'readonly');
+                const userStore = userTransaction.objectStore(USER_STORE);
+                const userRequest = userStore.getAll();
+                
+                userRequest.onsuccess = function() {
+                    const allUsers = userRequest.result;
+                    
+                    // Filter out admin users
+                    const nonAdminUsers = allUsers.filter(user => !user.isAdmin);
+                    
+                    if (nonAdminUsers.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No users found</td></tr>';
+                        return;
+                    }
+                    
+                    // For each user, find their latest attendance record
+                    const userAttendance = nonAdminUsers.map(user => {
+                        const userRecords = allAttendanceRecords.filter(record => record.qrNumber === user.qrNumber);
+                        const latestRecord = userRecords.length > 0 ? 
+                            userRecords.reduce((latest, current) => 
+                                new Date(current.time) > new Date(latest.time) ? current : latest
+                            ) : null;
+                        
+                        return {
+                            user: user,
+                            latestRecord: latestRecord,
+                            isPresentToday: latestRecord ? 
+                                new Date(latestRecord.time).toDateString() === today : false
+                        };
+                    });
+                    
+                    // Sort by name
+                    const sortedUsers = [...userAttendance].sort((a, b) => 
+                        a.user.name.localeCompare(b.user.name)
+                    );
+                    
+                    sortedUsers.forEach(item => {
+                        const row = document.createElement('tr');
+                        
+                        // User cell with avatar and name
+                        const userCell = document.createElement('td');
+                        userCell.className = 'user-cell';
+                        userCell.innerHTML = `
+                            <img src="${item.user.photo}" class="user-avatar" alt="${item.user.name}">
+                            <span class="user-name">${item.user.name}</span>
+                        `;
+                        row.appendChild(userCell);
+                        
+                        // QR Number cell
+                        const qrCell = document.createElement('td');
+                        qrCell.textContent = item.user.qrNumber;
+                        row.appendChild(qrCell);
+                        
+                        // Status cell
+                        const statusCell = document.createElement('td');
+                        statusCell.innerHTML = item.isPresentToday 
+                            ? `<span class="time-in">Present</span>` 
+                            : `<span class="absent">Absent</span>`;
+                        row.appendChild(statusCell);
+                        
+                        // Time cell with formatted time if present
+                        const timeCell = document.createElement('td');
+                        timeCell.className = 'time-cell';
+                        if (item.latestRecord) {
+                            const recordTime = new Date(item.latestRecord.time);
+                            timeCell.innerHTML = `
+                                <div>${recordTime.toLocaleDateString()}</div>
+                                <div>${recordTime.toLocaleTimeString()}</div>
+                            `;
+                        } else {
+                            timeCell.textContent = '-';
+                        }
+                        row.appendChild(timeCell);
+                        
+                        // Details cell
+                        const detailsCell = document.createElement('td');
+                        detailsCell.innerHTML = `
+                            <div><strong>Age:</strong> ${item.user.age}</div>
+                            <div><strong>Phone:</strong> ${item.user.phone}</div>
+                            <div><strong>Address:</strong> ${item.user.address}</div>
+                        `;
+                        row.appendChild(detailsCell);
+                        
+                        tableBody.appendChild(row);
+                    });
                 };
-            });
-            
-            // Sort by name
-            const sortedUsers = [...allUsers].sort((a, b) => a.name.localeCompare(b.name));
-            
-            sortedUsers.forEach(user => {
-                const row = document.createElement('tr');
-                
-                // User cell with avatar and name
-                const userCell = document.createElement('td');
-                userCell.className = 'user-cell';
-                userCell.innerHTML = `
-                    <img src="${user.photo}" class="user-avatar" alt="${user.name}">
-                    <span class="user-name">${user.name}</span>
-                `;
-                row.appendChild(userCell);
-                
-                // QR Number cell
-                const qrCell = document.createElement('td');
-                qrCell.textContent = user.qrNumber;
-                row.appendChild(qrCell);
-                
-                // Status cell
-                const statusCell = document.createElement('td');
-                statusCell.innerHTML = user.isPresent 
-                    ? `<span class="time-in">Present</span>` 
-                    : `<span class="absent">Absent</span>`;
-                row.appendChild(statusCell);
-                
-                // Time cell with formatted time if present
-                const timeCell = document.createElement('td');
-                timeCell.className = 'time-cell';
-                if (user.isPresent && user.time) {
-                    timeCell.innerHTML = `
-                        <div>${user.time.toLocaleDateString()}</div>
-                        <div>${user.time.toLocaleTimeString()}</div>
-                    `;
-                } else {
-                    timeCell.textContent = '-';
-                }
-                row.appendChild(timeCell);
-                
-                // Details cell
-                const detailsCell = document.createElement('td');
-                detailsCell.innerHTML = `
-                    <div><strong>Age:</strong> ${user.age}</div>
-                    <div><strong>Phone:</strong> ${user.phone}</div>
-                    <div><strong>Address:</strong> ${user.address}</div>
-                `;
-                row.appendChild(detailsCell);
-                
-                tableBody.appendChild(row);
-            });
+            };
         }
         
-        // Initialize with scan section visible
-        scanSection.style.display = 'block';
-        adminSection.style.display = 'none';
-        attendanceSection.style.display = 'none';
-        
-        // Initialize the app
-        initApp();
+        // Initialize with login modal
+        loginModal.style.display = 'flex';
+        appContent.style.display = 'none';
         
         // Clean up when page is closed
         window.addEventListener('beforeunload', () => {
             stopScanner();
         });
-        
-        // Expose functions for Android interface
-        window.onStoragePermissionGranted = onStoragePermissionGranted;
-        window.onDatabaseRestored = onDatabaseRestored;
     </script>
 </body>
 </html>
